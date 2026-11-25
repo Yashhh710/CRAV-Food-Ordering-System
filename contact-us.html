@@ -778,13 +778,14 @@
                 message: this.elements['message'] ? this.elements['message'].value.trim() : ''
             };
 
+            var API_BASE_URL = (window.CravAuth && window.CravAuth.API_BASE_URL) || window.CRAV_API_BASE || 'https://crav-h5cj.onrender.com';
             var token = window.CravAuth ? window.CravAuth.getToken() : null;
             var headers = { 'Content-Type': 'application/json' };
             if (token) headers['Authorization'] = 'Bearer ' + token;
 
             var form = this;
 
-            fetch('/api/reservations/create', {
+            fetch(API_BASE_URL + '/api/reservations/create', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(formData)

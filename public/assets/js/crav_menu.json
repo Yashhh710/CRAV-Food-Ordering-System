@@ -1,0 +1,452 @@
+{
+  "store": "CRAV",
+  "currency": "INR",
+  "imageFolder": "assets/models",
+  "categories": [
+    {
+      "id": "pizza",
+      "name": "Pizza",
+      "items": [
+        {
+          "id": "margherita-pizza",
+          "name": "Margherita Pizza",
+          "price": 179,
+          "image": "assets/models/menu/margherita-pizza.png"
+        },
+        {
+          "id": "farmhouse-pizza",
+          "name": "Farmhouse Pizza",
+          "price": 249,
+          "image": "assets/models/menu/farmhouse-pizza.png"
+        },
+        {
+          "id": "double-cheese-pizza",
+          "name": "Double Cheese Pizza",
+          "price": 229,
+          "image": "assets/models/menu/double-cheese-pizza.png"
+        },
+        {
+          "id": "bbq-chicken-pizza",
+          "name": "BBQ Chicken Pizza",
+          "price": 299,
+          "image": "assets/models/menu/bbq-chicken-pizza.png"
+        },
+        {
+          "id": "peri-peri-chicken-pizza",
+          "name": "Peri Peri Chicken Pizza",
+          "price": 299,
+          "image": "assets/models/menu/peri-peri-chicken-pizza.png"
+        },
+        {
+          "id": "paneer-tikka-pizza",
+          "name": "Paneer Tikka Pizza",
+          "price": 259,
+          "image": "assets/models/menu/paneer-tikka-pizza.png"
+        },
+        {
+          "id": "pepperoni-pizza",
+          "name": "Pepperoni Pizza",
+          "price": 329,
+          "image": "assets/models/menu/pepperoni-pizza.png"
+        },
+        {
+          "id": "mexican-pizza",
+          "name": "Mexican Pizza",
+          "price": 269,
+          "image": "assets/models/menu/mexican-pizza.png"
+        }
+      ]
+    },
+    {
+      "id": "burgers",
+      "name": "Burgers",
+      "items": [
+        {
+          "id": "classic-veg-burger",
+          "name": "Classic Veg Burger",
+          "price": 99,
+          "image": "assets/models/menu/classic-veg-burger.png"
+        },
+        {
+          "id": "aloo-tikki-burger",
+          "name": "Aloo Tikki Burger",
+          "price": 89,
+          "image": "assets/models/menu/aloo-tikki-burger.png"
+        },
+        {
+          "id": "paneer-burger",
+          "name": "Paneer Burger",
+          "price": 139,
+          "image": "assets/models/menu/paneer-burger.png"
+        },
+        {
+          "id": "crispy-chicken-burger",
+          "name": "Crispy Chicken Burger",
+          "price": 159,
+          "image": "assets/models/menu/crispy-chicken-burger.png"
+        },
+        {
+          "id": "spicy-chicken-burger",
+          "name": "Spicy Chicken Burger",
+          "price": 169,
+          "image": "assets/models/menu/spicy-chicken-burger.png"
+        },
+        {
+          "id": "double-cheese-burger",
+          "name": "Double Cheese Burger",
+          "price": 149,
+          "image": "assets/models/menu/double-cheese-burger.png"
+        },
+        {
+          "id": "bbq-chicken-burger",
+          "name": "BBQ Chicken Burger",
+          "price": 179,
+          "image": "assets/models/menu/bbq-chicken-burger.png"
+        },
+        {
+          "id": "zinger-burger",
+          "name": "Zinger Burger",
+          "price": 189,
+          "image": "assets/models/menu/zinger-burger.png"
+        }
+      ]
+    },
+    {
+      "id": "chicken",
+      "name": "Chicken",
+      "items": [
+        {
+          "id": "hot-crispy-chicken",
+          "name": "Hot & Crispy Chicken",
+          "price": 199,
+          "image": "assets/models/menu/hot-crispy-chicken.png"
+        },
+        {
+          "id": "chicken-strips",
+          "name": "Chicken Strips",
+          "price": 149,
+          "image": "assets/models/menu/chicken-strips.png"
+        },
+        {
+          "id": "chicken-wings",
+          "name": "Chicken Wings",
+          "price": 179,
+          "image": "assets/models/menu/chicken-wings.png"
+        },
+        {
+          "id": "chicken-nuggets",
+          "name": "Chicken Nuggets",
+          "price": 129,
+          "image": "assets/models/menu/chicken-nuggets.png"
+        },
+        {
+          "id": "popcorn-chicken",
+          "name": "Popcorn Chicken",
+          "price": 139,
+          "image": "assets/models/menu/popcorn-chicken.png"
+        },
+        {
+          "id": "chicken-tenders",
+          "name": "Chicken Tenders",
+          "price": 169,
+          "image": "assets/models/menu/chicken-tenders.png"
+        },
+        {
+          "id": "grilled-chicken",
+          "name": "Grilled Chicken",
+          "price": 229,
+          "image": "assets/models/menu/grilled-chicken.png"
+        }
+      ]
+    },
+    {
+      "id": "sides-snacks",
+      "name": "Sides & Snacks",
+      "items": [
+        {
+          "id": "french-fries",
+          "name": "French Fries",
+          "price": 79,
+          "image": "assets/models/menu/french-fries.png"
+        },
+        {
+          "id": "peri-peri-fries",
+          "name": "Peri Peri Fries",
+          "price": 99,
+          "image": "assets/models/menu/peri-peri-fries.png"
+        },
+        {
+          "id": "cheese-fries",
+          "name": "Cheese Fries",
+          "price": 119,
+          "image": "assets/models/menu/cheese-fries.png"
+        },
+        {
+          "id": "onion-rings",
+          "name": "Onion Rings",
+          "price": 99,
+          "image": "assets/models/menu/onion-rings.png"
+        },
+        {
+          "id": "potato-wedges",
+          "name": "Potato Wedges",
+          "price": 89,
+          "image": "assets/models/menu/potato-wedges.png"
+        },
+        {
+          "id": "garlic-bread",
+          "name": "Garlic Bread",
+          "price": 109,
+          "image": "assets/models/menu/garlic-bread.png"
+        },
+        {
+          "id": "cheese-balls",
+          "name": "Cheese Balls",
+          "price": 119,
+          "image": "assets/models/menu/cheese-balls.png"
+        },
+        {
+          "id": "veg-nuggets",
+          "name": "Veg Nuggets",
+          "price": 99,
+          "image": "assets/models/menu/veg-nuggets.png"
+        }
+      ]
+    },
+    {
+      "id": "wraps-rolls",
+      "name": "Wraps & Rolls",
+      "items": [
+        {
+          "id": "chicken-wrap",
+          "name": "Chicken Wrap",
+          "price": 149,
+          "image": "assets/models/menu/chicken-wrap.png"
+        },
+        {
+          "id": "veg-wrap",
+          "name": "Veg Wrap",
+          "price": 109,
+          "image": "assets/models/menu/veg-wrap.png"
+        },
+        {
+          "id": "paneer-wrap",
+          "name": "Paneer Wrap",
+          "price": 129,
+          "image": "assets/models/menu/paneer-wrap.png"
+        },
+        {
+          "id": "spicy-chicken-roll",
+          "name": "Spicy Chicken Roll",
+          "price": 159,
+          "image": "assets/models/menu/spicy-chicken-roll.png"
+        },
+        {
+          "id": "bbq-chicken-roll",
+          "name": "BBQ Chicken Roll",
+          "price": 169,
+          "image": "assets/models/menu/bbq-chicken-roll.png"
+        }
+      ]
+    },
+    {
+      "id": "sandwiches",
+      "name": "Sandwiches",
+      "items": [
+        {
+          "id": "grilled-veg-sandwich",
+          "name": "Grilled Veg Sandwich",
+          "price": 99,
+          "image": "assets/models/menu/grilled-veg-sandwich.png"
+        },
+        {
+          "id": "cheese-sandwich",
+          "name": "Cheese Sandwich",
+          "price": 119,
+          "image": "assets/models/menu/cheese-sandwich.png"
+        },
+        {
+          "id": "paneer-sandwich",
+          "name": "Paneer Sandwich",
+          "price": 139,
+          "image": "assets/models/menu/paneer-sandwich.png"
+        },
+        {
+          "id": "chicken-sandwich",
+          "name": "Chicken Sandwich",
+          "price": 159,
+          "image": "assets/models/menu/chicken-sandwich.png"
+        },
+        {
+          "id": "club-sandwich",
+          "name": "Club Sandwich",
+          "price": 179,
+          "image": "assets/models/menu/club-sandwich.png"
+        }
+      ]
+    },
+    {
+      "id": "desserts",
+      "name": "Desserts",
+      "items": [
+        {
+          "id": "chocolate-brownie",
+          "name": "Chocolate Brownie",
+          "price": 99,
+          "image": "assets/models/menu/chocolate-brownie.png"
+        },
+        {
+          "id": "chocolate-lava-cake",
+          "name": "Chocolate Lava Cake",
+          "price": 119,
+          "image": "assets/models/menu/chocolate-lava-cake.png"
+        },
+        {
+          "id": "chocolate-mousse",
+          "name": "Chocolate Mousse",
+          "price": 109,
+          "image": "assets/models/menu/chocolate-mousse.png"
+        },
+        {
+          "id": "chocolate-donut",
+          "name": "Chocolate Donut",
+          "price": 69,
+          "image": "assets/models/menu/chocolate-donut.png"
+        },
+        {
+          "id": "ice-cream",
+          "name": "Ice Cream",
+          "price": 79,
+          "image": "assets/models/menu/ice-cream.png"
+        },
+        {
+          "id": "cheesecake",
+          "name": "Cheesecake",
+          "price": 149,
+          "image": "assets/models/menu/cheesecake.png"
+        }
+      ]
+    },
+    {
+      "id": "beverages",
+      "name": "Beverages",
+      "items": [
+        {
+          "id": "coca-cola",
+          "name": "Coca-Cola",
+          "price": 49,
+          "image": "assets/models/menu/coca-cola.png"
+        },
+        {
+          "id": "pepsi",
+          "name": "Pepsi",
+          "price": 49,
+          "image": "assets/models/menu/pepsi.png"
+        },
+        {
+          "id": "sprite",
+          "name": "Sprite",
+          "price": 49,
+          "image": "assets/models/menu/sprite.png"
+        },
+        {
+          "id": "fanta",
+          "name": "Fanta",
+          "price": 49,
+          "image": "assets/models/menu/fanta.png"
+        },
+        {
+          "id": "cold-coffee",
+          "name": "Cold Coffee",
+          "price": 99,
+          "image": "assets/models/menu/cold-coffee.png"
+        },
+        {
+          "id": "chocolate-milkshake",
+          "name": "Chocolate Milkshake",
+          "price": 129,
+          "image": "assets/models/menu/chocolate-milkshake.png"
+        },
+        {
+          "id": "oreo-shake",
+          "name": "Oreo Shake",
+          "price": 149,
+          "image": "assets/models/menu/oreo-shake.png"
+        },
+        {
+          "id": "lemon-iced-tea",
+          "name": "Lemon Iced Tea",
+          "price": 89,
+          "image": "assets/models/menu/lemon-iced-tea.png"
+        },
+        {
+          "id": "mineral-water",
+          "name": "Mineral Water",
+          "price": 20,
+          "image": "assets/models/menu/mineral-water.png"
+        }
+      ]
+    },
+    {
+      "id": "combos-meals",
+      "name": "Combos & Meals",
+      "items": [
+        {
+          "id": "burger-fries-drink-combo",
+          "name": "Burger + Fries + Drink",
+          "price": 199,
+          "image": "assets/models/menu/burger-fries-drink-combo.png"
+        },
+        {
+          "id": "pizza-garlic-bread-drink-combo",
+          "name": "Pizza + Garlic Bread + Drink",
+          "price": 349,
+          "image": "assets/models/menu/pizza-garlic-bread-drink-combo.png"
+        },
+        {
+          "id": "chicken-bucket-meal",
+          "name": "Chicken Bucket Meal",
+          "price": 499,
+          "image": "assets/models/menu/chicken-bucket-meal.png"
+        },
+        {
+          "id": "family-feast-box",
+          "name": "Family Feast Box",
+          "price": 799,
+          "image": "assets/models/menu/family-feast-box.png"
+        },
+        {
+          "id": "wings-combo",
+          "name": "Wings Combo",
+          "price": 249,
+          "image": "assets/models/menu/wings-combo.png"
+        },
+        {
+          "id": "student-meal",
+          "name": "Student Meal",
+          "price": 159,
+          "image": "assets/models/menu/student-meal.png"
+        }
+      ]
+    },
+    {
+      "id": "crav-studio",
+      "name": "CRAV Studio",
+      "items": [
+        {
+          "id": "build-your-own-pizza",
+          "name": "Build Your Own Pizza",
+          "price": 199,
+          "image": "assets/models/menu/margherita-pizza.png"
+        },
+        {
+          "id": "build-your-own-burger",
+          "name": "Build Your Own Burger",
+          "price": 129,
+          "image": "assets/models/menu/classic-veg-burger.png"
+        }
+      ],
+      "customizable": true
+    }
+  ]
+}

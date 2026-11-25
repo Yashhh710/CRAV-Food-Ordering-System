@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRAV | Management & Staff Portal</title>
+  <link rel="shortcut icon" type="image/png" href="assets/models/logo.png">
+  <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/vendor/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --crav-red: #D90019;
+      --crav-burgundy: #8F1420;
+      --crav-cream: #FFF9E9;
+      --crav-black: #080808;
+      --crav-card-bg: #111111;
+      --crav-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(ellipse at 50% 20%, #1f0b0d 0%, #0d0405 50%, #050203 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 16px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient glow */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(217, 0, 25, 0.15) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(143, 20, 32, 0.2) 0%, transparent 70%);
+      bottom: -80px;
+      left: -80px;
+      pointer-events: none;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(18, 18, 20, 0.92);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--crav-border);
+      border-radius: 24px;
+      padding: 40px 36px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(217, 0, 25, 0.12);
+      position: relative;
+      z-index: 2;
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .brand-logo {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(217, 0, 25, 0.12);
+      border: 1px solid rgba(217, 0, 25, 0.3);
+      border-radius: 18px;
+      padding: 10px;
+    }
+
+    .brand-logo img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .brand-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+      margin-bottom: 3px;
+    }
+
+    .brand-title span {
+      color: var(--crav-red);
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: #a0a0a5;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 600;
+    }
+
+    /* Auth Tab Navigation */
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 5px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: #a1a1aa;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .auth-tab-btn.active {
+      background: var(--crav-red);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(217, 0, 25, 0.4);
+    }
+    .auth-tab-btn:hover:not(.active) {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #e0e0e0;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      color: #71717a;
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .form-control, .form-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 13.5px;
+      padding: 12px 14px 12px 42px;
+      transition: all 0.2s ease;
+      height: auto;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--crav-red);
+      box-shadow: 0 0 0 3px rgba(217, 0, 25, 0.25);
+      color: #fff;
+    }
+
+    .form-control::placeholder {
+      color: #636369;
+    }
+
+    .form-select option {
+      background: #18181b;
+      color: #fff;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      color: #71717a;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .toggle-password:hover {
+      color: #fff;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--crav-red) 0%, var(--crav-burgundy) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-weight: 700;
+      font-size: 14.5px;
+      letter-spacing: 0.4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 10px 25px rgba(217, 0, 25, 0.35);
+      margin-top: 14px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(217, 0, 25, 0.5);
+      color: #fff;
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .alert {
+      border-radius: 12px;
+      font-size: 13px;
+      padding: 12px 16px;
+      display: none;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .alert-danger {
+      background: rgba(217, 0, 25, 0.15);
+      border: 1px solid rgba(217, 0, 25, 0.4);
+      color: #ff858d;
+    }
+    .alert-warning {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fcd34d;
+    }
+    .alert-success {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #86efac;
+    }
+
+    .role-hint-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .security-notice {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+    }
+
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      color: #a1a1aa;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+    }
+
+    .security-badge i {
+      color: var(--crav-red);
+    }
+
+    .back-home {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-size: 12.5px;
+      color: #71717a;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-home:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="brand-header">
+      <div class="brand-logo">
+        <img src="assets/models/logo.png" alt="CRAV">
+      </div>
+      <h1 class="brand-title">CRAV <span>CONTROL</span></h1>
+      <p class="brand-subtitle">Restaurant Management Center</p>
+    </div>
+
+    <!-- Tab navigation -->
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab-btn active" id="tabLoginBtn" onclick="switchTab('login')">
+        <i class="fa-solid fa-lock"></i> Staff Sign In
+      </button>
+      <button type="button" class="auth-tab-btn" id="tabRequestBtn" onclick="switchTab('request')">
+        <i class="fa-solid fa-user-plus"></i> Request Role Access
+      </button>
+    </div>
+
+    <div class="alert alert-danger" id="errorAlert" role="alert"></div>
+    <div class="alert alert-warning" id="warningAlert" role="alert"></div>
+    <div class="alert alert-success" id="successAlert" role="alert"></div>
+
+    <!-- 1. SIGN IN FORM -->
+    <div id="loginSection">
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label class="form-label" for="adminEmail">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input type="email" id="adminEmail" class="form-control" placeholder="your.email@crav.example" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminPassword">
+            <span>Password</span>
+          </label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-lock input-icon"></i>
+            <input type="password" id="adminPassword" class="form-control" placeholder="••••••••••••" required autocomplete="current-password">
+            <i class="fa-regular fa-eye toggle-password" id="togglePassword"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="loginBtn">
+          <span id="btnText">Sign In to Station</span>
+          <i class="fa-solid fa-arrow-right-to-bracket" id="btnIcon"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- 2. REQUEST ROLE ACCESS FORM -->
+    <div id="requestSection" style="display: none;">
+      <form id="requestAccessForm">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="form-label" for="reqFname">First Name</label>
+              <div class="input-wrapper">
+                <i class="fa-regular fa-user input-icon"></i>
+                <input type="text" id="reqFname" class="form-control" placeholder="Amit" required>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="form-label" for="reqLname">Last Name</label>
+              <div class="input-wrapper">
+                <i class="fa-regular fa-user input-icon"></i>
+                <input type="text" id="reqLname" class="form-control" placeholder="Sharma" required>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reqEmail">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope input-icon"></i>
+            <input type="email" id="reqEmail" class="form-control" placeholder="staff.applicant@crav.example" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="reqPhone">Phone Number</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-phone input-icon"></i>
+            <input type="tel" id="reqPhone" class="form-control" placeholder="+91 98000 00000" required>
+          </div>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="form-group">
+          <label class="form-label" for="reqRole">Desired Operational Station / Role</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-id-badge input-icon"></i>
+            <select id="reqRole" class="form-select" required onchange="updateRoleHint()">
+              <option value="" disabled selected>-- Select your intended role --</option>
+              <option value="DELIVERY_BOY">🛵 Delivery Boy / Partner (Assigned Orders Console)</option>
+              <option value="KITCHEN_STAFF">🍳 Kitchen Staff (Cooking & KDS Display Station)</option>
+              <option value="ORDER_MANAGER">📦 Order Manager (Order Intake & Kitchen Dispatch)</option>
+              <option value="INVENTORY_MANAGER">🥩 Inventory Manager (Raw Ingredients & Packaging)</option>
+              <option value="CASHIER">💳 Cashier (Counter Billing & Cash Payments)</option>
+              <option value="CUSTOMER_SUPPORT">🎧 Customer Support (Customer Lookup & Reviews)</option>
+              <option value="RESTAURANT_MANAGER">👔 Restaurant Manager (Daily Operations Monitor)</option>
+            </select>
+          </div>
+          <div class="role-hint-card" id="roleHintCard">
+            <i class="fa-solid fa-circle-info text-danger me-1"></i>
+            <span id="roleHintText">Select the role you are applying for. The Super Admin will review and unlock only that operational section for your account.</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="form-label" for="reqPassword">Password</label>
+              <div class="input-wrapper">
+                <i class="fa-regular fa-lock input-icon"></i>
+                <input type="password" id="reqPassword" class="form-control" placeholder="Create password" required minlength="6">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label class="form-label" for="reqPasswordConfirm">Confirm</label>
+              <div class="input-wrapper">
+                <i class="fa-regular fa-lock input-icon"></i>
+                <input type="password" id="reqPasswordConfirm" class="form-control" placeholder="Repeat password" required minlength="6">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="requestBtn">
+          <span id="reqBtnText">Submit Request to Admin</span>
+          <i class="fa-solid fa-paper-plane" id="reqBtnIcon"></i>
+        </button>
+      </form>
+    </div>
+
+    <div class="security-notice">
+      <div class="security-badge">
+        <i class="fa-solid fa-shield-halved"></i> Role-Based Access Control & Admin Approval Required
+      </div>
+      <p style="font-size: 11.5px; color: #71717a; margin: 4px 0 0;">
+        Access to privileged stations is unlocked strictly upon Super Admin review.
+      </p>
+
+      <a href="index.html" class="back-home">
+        <i class="fa-regular fa-arrow-left me-1"></i> Return to CRAV Customer Website
+      </a>
+    </div>
+  </div>
+
+  <script>
+    var API_BASE_URL = 'https://crav-h5cj.onrender.com';
+    function switchTab(tab) {
+      var loginSec = document.getElementById('loginSection');
+      var reqSec = document.getElementById('requestSection');
+      var tabLoginBtn = document.getElementById('tabLoginBtn');
+      var tabRequestBtn = document.getElementById('tabRequestBtn');
+      var err = document.getElementById('errorAlert');
+      var warn = document.getElementById('warningAlert');
+      var succ = document.getElementById('successAlert');
+
+      err.style.display = 'none';
+      warn.style.display = 'none';
+      succ.style.display = 'none';
+
+      if (tab === 'login') {
+        loginSec.style.display = 'block';
+        reqSec.style.display = 'none';
+        tabLoginBtn.classList.add('active');
+        tabRequestBtn.classList.remove('active');
+      } else {
+        loginSec.style.display = 'none';
+        reqSec.style.display = 'block';
+        tabLoginBtn.classList.remove('active');
+        tabRequestBtn.classList.add('active');
+      }
+    }
+
+    function updateRoleHint() {
+      var val = document.getElementById('reqRole').value;
+      var text = document.getElementById('roleHintText');
+      var hints = {
+        'DELIVERY_BOY': '🛵 Unlocks ONLY the Delivery Partner Console. You will see only your assigned orders, customer drop addresses, and live delivery status controls.',
+        'KITCHEN_STAFF': '🍳 Unlocks ONLY the Kitchen Display System (KDS). You will see real-time food tickets, preparation instructions, and cooking status timers.',
+        'ORDER_MANAGER': '📦 Unlocks Order Management & Dispatch. You will be able to review, accept/reject incoming orders, and assign drivers.',
+        'INVENTORY_MANAGER': '🥩 Unlocks Inventory & Stock Intake. You will manage raw ingredient counts, packaging stock, and low-inventory warnings.',
+        'CASHIER': '💳 Unlocks Payments & Billing. You will manage physical cash collection, record payments, and print thermal receipts.',
+        'CUSTOMER_SUPPORT': '🎧 Unlocks Customer Directory & Feedback moderation. You will handle customer inquiries and view order lookup.',
+        'RESTAURANT_MANAGER': '👔 Unlocks Operational Overview, Kitchen monitoring, and Daily Reports.'
+      };
+      text.textContent = hints[val] || 'The Super Admin will review and unlock only that operational section for your account.';
+    }
+
+    (function() {
+      // Auto-redirect if already logged in with privileged token
+      var existingToken = localStorage.getItem('crav_admin_token');
+      var existingUser = localStorage.getItem('crav_admin_user');
+      if (existingToken && existingUser) {
+        try {
+          var userObj = JSON.parse(existingUser);
+          if (userObj && userObj.role && userObj.role.toUpperCase() !== 'CUSTOMER') {
+            window.location.replace('admin.html');
+            return;
+          }
+        } catch(e) {}
+      }
+
+      var loginForm = document.getElementById('adminLoginForm');
+      var emailInput = document.getElementById('adminEmail');
+      var passInput = document.getElementById('adminPassword');
+      var loginBtn = document.getElementById('loginBtn');
+      var btnText = document.getElementById('btnText');
+      var btnIcon = document.getElementById('btnIcon');
+
+      var requestForm = document.getElementById('requestAccessForm');
+      var requestBtn = document.getElementById('requestBtn');
+      var reqBtnText = document.getElementById('reqBtnText');
+      var reqBtnIcon = document.getElementById('reqBtnIcon');
+
+      var errorAlert = document.getElementById('errorAlert');
+      var warningAlert = document.getElementById('warningAlert');
+      var successAlert = document.getElementById('successAlert');
+      var togglePass = document.getElementById('togglePassword');
+
+      togglePass.addEventListener('click', function() {
+        if (passInput.type === 'password') {
+          passInput.type = 'text';
+          togglePass.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+          passInput.type = 'password';
+          togglePass.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+      });
+
+      function showError(msg) {
+        errorAlert.textContent = msg;
+        errorAlert.style.display = 'block';
+        warningAlert.style.display = 'none';
+        successAlert.style.display = 'none';
+      }
+
+      function showWarning(msg) {
+        warningAlert.textContent = msg;
+        warningAlert.style.display = 'block';
+        errorAlert.style.display = 'none';
+        successAlert.style.display = 'none';
+      }
+
+      function showSuccess(msg) {
+        successAlert.textContent = msg;
+        successAlert.style.display = 'block';
+        errorAlert.style.display = 'none';
+        warningAlert.style.display = 'none';
+      }
+
+      // Handle Sign In
+      loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        errorAlert.style.display = 'none';
+        warningAlert.style.display = 'none';
+        successAlert.style.display = 'none';
+
+        var email = emailInput.value.trim();
+        var password = passInput.value;
+
+        if (!email || !password) {
+          showError('Please enter both your email and password.');
+          return;
+        }
+
+        loginBtn.disabled = true;
+        btnText.textContent = 'Verifying credentials...';
+        btnIcon.className = 'fa-solid fa-spinner fa-spin';
+
+        try {
+          var res = await fetch(API_BASE_URL + '/api/admin/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, password: password })
+          });
+
+          var data = await res.json();
+
+          if (!res.ok || !data.success) {
+            if (data.isPending) {
+              showWarning(data.message);
+            } else {
+              showError(data.message || 'Authentication failed. Please verify your credentials.');
+            }
+            loginBtn.disabled = false;
+            btnText.textContent = 'Sign In to Station';
+            btnIcon.className = 'fa-solid fa-arrow-right-to-bracket';
+            return;
+          }
+
+          // Save admin token and user info
+          localStorage.setItem('crav_admin_token', data.token);
+          localStorage.setItem('crav_admin_user', JSON.stringify(data.user));
+
+          showSuccess('Authenticated! Unlocking station for ' + (data.user.role || '').replace(/_/g, ' ') + '...');
+          btnText.textContent = 'Launching Station...';
+          btnIcon.className = 'fa-solid fa-check';
+
+          setTimeout(function() {
+            window.location.href = 'admin.html';
+          }, 800);
+
+        } catch (err) {
+          showError('Network error connecting to authentication server.');
+          loginBtn.disabled = false;
+          btnText.textContent = 'Sign In to Station';
+          btnIcon.className = 'fa-solid fa-arrow-right-to-bracket';
+        }
+      });
+
+      // Handle Request Staff Access
+      requestForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        errorAlert.style.display = 'none';
+        warningAlert.style.display = 'none';
+        successAlert.style.display = 'none';
+
+        var fname = document.getElementById('reqFname').value.trim();
+        var lname = document.getElementById('reqLname').value.trim();
+        var email = document.getElementById('reqEmail').value.trim();
+        var phone = document.getElementById('reqPhone').value.trim();
+        var role = document.getElementById('reqRole').value;
+        var pass = document.getElementById('reqPassword').value;
+        var pass2 = document.getElementById('reqPasswordConfirm').value;
+
+        if (!role) {
+          showError('Please select the station/role you want to apply for.');
+          return;
+        }
+
+        if (pass !== pass2) {
+          showError('Passwords do not match. Please re-enter.');
+          return;
+        }
+
+        requestBtn.disabled = true;
+        reqBtnText.textContent = 'Submitting application...';
+        reqBtnIcon.className = 'fa-solid fa-spinner fa-spin';
+
+        try {
+          var res = await fetch(API_BASE_URL + '/api/admin/auth/request-access', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              firstName: fname,
+              lastName: lname,
+              email: email,
+              phone: phone,
+              requestedRole: role,
+              password: pass
+            })
+          });
+
+          var data = await res.json();
+
+          if (!res.ok || !data.success) {
+            showError(data.message || 'Error submitting access request.');
+            requestBtn.disabled = false;
+            reqBtnText.textContent = 'Submit Request to Admin';
+            reqBtnIcon.className = 'fa-solid fa-paper-plane';
+            return;
+          }
+
+          showSuccess('🎉 ' + data.message);
+          requestForm.reset();
+          requestBtn.disabled = false;
+          reqBtnText.textContent = 'Submit Request to Admin';
+          reqBtnIcon.className = 'fa-solid fa-paper-plane';
+
+          // Switch back to login tab after 2.5s with email prefilled
+          setTimeout(function() {
+            emailInput.value = email;
+            switchTab('login');
+            showWarning('Your application is pending. When the Super Admin approves it, you can log in right here.');
+          }, 2500);
+
+        } catch (err) {
+          showError('Network error submitting request. Please try again.');
+          requestBtn.disabled = false;
+          reqBtnText.textContent = 'Submit Request to Admin';
+          reqBtnIcon.className = 'fa-solid fa-paper-plane';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

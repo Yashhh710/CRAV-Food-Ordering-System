@@ -509,6 +509,7 @@
         <script src="assets/js/crav_cart.js"></script>
         <script>
             (function () {
+                var API_BASE_URL = (window.CravAuth && window.CravAuth.API_BASE_URL) || window.CRAV_API_BASE || 'https://crav-h5cj.onrender.com';
                 var loginForm = document.getElementById('crav-login-form');
                 var alertMsg = document.getElementById('login-alert-msg');
                 var submitBtn = document.getElementById('login-submit-btn');
@@ -583,7 +584,7 @@
                     forgotAlert.className = 'alert alert-info py-2 mb-20';
                     forgotAlert.textContent = 'Sending password reset code...';
 
-                    fetch('/api/auth/forgot-password', {
+                    fetch(API_BASE_URL + '/api/auth/forgot-password', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email: resetEmail })
@@ -620,7 +621,7 @@
                     forgotAlert.className = 'alert alert-info py-2 mb-20';
                     forgotAlert.textContent = 'Verifying OTP & updating password...';
 
-                    fetch('/api/auth/reset-password', {
+                    fetch(API_BASE_URL + '/api/auth/reset-password', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({

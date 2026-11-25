@@ -10,6 +10,7 @@
     'use strict';
 
     /* ================= config ================= */
+    var API_BASE_URL = (window.CravAuth && window.CravAuth.API_BASE_URL) || window.CRAV_API_BASE || 'https://crav-h5cj.onrender.com';
     var KEY_CART = 'crav_cart';
     var KEY_COUPON = 'crav_coupon';
     var KEY_ORDERS = 'crav_orders';
@@ -425,7 +426,7 @@
             if (token) headers['Authorization'] = 'Bearer ' + token;
 
             // Save order to server database in real time
-            fetch('/api/orders', {
+            fetch(API_BASE_URL + '/api/orders', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(order)
@@ -477,7 +478,7 @@
         var headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = 'Bearer ' + token;
 
-        fetch('/api/payments/create-demo-qr', {
+        fetch(API_BASE_URL + '/api/payments/create-demo-qr', {
             method: 'POST',
             headers: headers,
             body: JSON.stringify(orderPayload)
@@ -504,6 +505,10 @@
 
     function renderActiveQrScreen(o, data, t, customer) {
         var orderId = data.orderId;
+        var payUrl = data.mobilePayUrl || (window.location.origin + '/pay-mobile.html?orderId=' + encodeURIComponent(orderId) + '&amount=' + encodeURIComponent(data.total));
+        if (payUrl.includes('localhost') || payUrl.includes('127.0.0.1')) {
+            payUrl = window.location.origin + '/pay-mobile.html?orderId=' + encodeURIComponent(orderId) + '&amount=' + encodeURIComponent(data.total);
+        }
         o.innerHTML = '<div class="cc-qr-card">' +
             '<span class="cc-qr-pill"><i class="fa-solid fa-graduation-cap"></i> Academic Demo Simulation</span>' +
             '<h4 class="mb-1" style="color:#D90019; font-weight:700;">Scan to Pay</h4>' +
@@ -516,7 +521,7 @@
             '</div>' +
             '<p class="cc-qr-instructions">Scan using <b>Google Lens</b> or your phone camera to open the mobile CRAV checkout.</p>' +
             '<div class="mb-3">' +
-            '<a href="' + esc(data.mobilePayUrl) + '" target="_blank" class="cc-qr-test-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Mobile Payment Page on this device</a>' +
+            '<a href="' + esc(payUrl) + '" target="_blank" class="cc-qr-test-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open Mobile Payment Page on this device</a>' +
             '</div>' +
             '<button type="button" class="btn btn-sm btn-outline-secondary" id="cancel-qr-btn">Cancel</button>' +
             '</div>';
@@ -531,7 +536,7 @@
 
         // Start real-time status polling
         qrPollTimer = setInterval(function () {
-            fetch('/api/payments/status/' + encodeURIComponent(orderId))
+            fetch(API_BASE_URL + '/api/payments/status/' + encodeURIComponent(orderId))
                 .then(function (r) { return r.json(); })
                 .then(function (st) {
                     if (st && st.status === 'Successful') {
@@ -578,7 +583,7 @@
             var headers = { 'Content-Type': 'application/json' };
             if (token) headers['Authorization'] = 'Bearer ' + token;
 
-            fetch('/api/orders', {
+            fetch(API_BASE_URL + '/api/orders', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(order)
@@ -755,7 +760,7 @@
 
         // If an order ID is provided, try loading from server first to ensure 100% device sync
         if (wanted) {
-            fetch('/api/orders/' + encodeURIComponent(wanted))
+            fetch(API_BASE_URL + '/api/orders/' + encodeURIComponent(wanted))
                 .then(function (r) { return r.json(); })
                 .then(function (res) {
                     if (res && res.success && res.order) {
@@ -795,7 +800,7 @@
             orders.forEach(function (o) { if (!order && (wanted ? o.id === wanted : true)) order = o; });
             if (order) {
                 // Ensure order is immediately saved to server database
-                fetch('/api/orders', {
+                fetch(API_BASE_URL + '/api/orders', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(order)
@@ -827,7 +832,7 @@
                 };
                 orders = [order];
                 save(KEY_ORDERS, orders);
-                fetch('/api/orders', {
+                fetch(API_BASE_URL + '/api/orders', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(order)
@@ -845,7 +850,7 @@
         var trackingLiveTimer = setInterval(function () {
             var currWanted = new URLSearchParams(location.search).get('order');
             if (currWanted) {
-                fetch('/api/orders/' + encodeURIComponent(currWanted))
+                fetch(API_BASE_URL + '/api/orders/' + encodeURIComponent(currWanted))
                     .then(function (r) { return r.json(); })
                     .then(function (res) {
                         if (res && res.success && res.order) {

@@ -6,6 +6,8 @@
 (function (window, document, $) {
   'use strict';
 
+var API_BASE_URL = 'https://crav-h5cj.onrender.com';
+
   var salesChartInstance = null;
   var orderStatusChartInstance = null;
   var currentUser = null;
@@ -97,7 +99,7 @@
         opts.body = (body instanceof FormData) ? body : JSON.stringify(body);
       }
 
-      var res = await fetch(url, opts);
+      var res = await fetch(API_BASE_URL + url, opts);
       var data = {};
       try {
         data = await res.json();

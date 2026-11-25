@@ -487,6 +487,7 @@
   </div>
 
   <script>
+    var API_BASE_URL = 'https://crav-h5cj.onrender.com';
     function switchTab(tab) {
       var loginSec = document.getElementById('loginSection');
       var reqSec = document.getElementById('requestSection');
@@ -610,7 +611,7 @@
         btnIcon.className = 'fa-solid fa-spinner fa-spin';
 
         try {
-          var res = await fetch('/api/admin/auth/login', {
+          var res = await fetch(API_BASE_URL + '/api/admin/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, password: password })
@@ -680,7 +681,7 @@
         reqBtnIcon.className = 'fa-solid fa-spinner fa-spin';
 
         try {
-          var res = await fetch('/api/admin/auth/request-access', {
+          var res = await fetch(API_BASE_URL + '/api/admin/auth/request-access', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

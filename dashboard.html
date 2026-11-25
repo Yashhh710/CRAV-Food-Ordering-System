@@ -909,6 +909,7 @@
                 return;
             }
 
+            var API_BASE_URL = (window.CravAuth && window.CravAuth.API_BASE_URL) || window.CRAV_API_BASE || 'https://crav-h5cj.onrender.com';
             var token = window.CravAuth.getToken();
             var user = window.CravAuth.getUser();
 
@@ -951,7 +952,7 @@
                 status.className = 'alert alert-info py-2';
                 status.textContent = 'Saving changes...';
 
-                fetch('/api/user/profile', {
+                fetch(API_BASE_URL + '/api/user/profile', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -991,7 +992,7 @@
                 status.className = 'alert alert-info py-2';
                 status.textContent = 'Updating password...';
 
-                fetch('/api/user/change-password', {
+                fetch(API_BASE_URL + '/api/user/change-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1026,7 +1027,7 @@
 
             document.getElementById('new-address-form').addEventListener('submit', function (e) {
                 e.preventDefault();
-                fetch('/api/user/addresses', {
+                fetch(API_BASE_URL + '/api/user/addresses', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1054,7 +1055,7 @@
 
             function loadAddresses() {
                 var listEl = document.getElementById('addresses-list');
-                fetch('/api/user/addresses', {
+                fetch(API_BASE_URL + '/api/user/addresses', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 })
                 .then(function (r) { return r.json(); })
@@ -1080,7 +1081,7 @@
                     listEl.querySelectorAll('.del-addr-btn').forEach(function (btn) {
                         btn.addEventListener('click', function () {
                             if (!confirm('Remove this saved address?')) return;
-                            fetch('/api/user/addresses/' + btn.getAttribute('data-id'), {
+                            fetch(API_BASE_URL + '/api/user/addresses/' + btn.getAttribute('data-id'), {
                                 method: 'DELETE',
                                 headers: { 'Authorization': 'Bearer ' + token }
                             }).then(function () { loadAddresses(); });
@@ -1089,7 +1090,7 @@
 
                     listEl.querySelectorAll('.set-def-btn').forEach(function (btn) {
                         btn.addEventListener('click', function () {
-                            fetch('/api/user/addresses/' + btn.getAttribute('data-id') + '/default', {
+                            fetch(API_BASE_URL + '/api/user/addresses/' + btn.getAttribute('data-id') + '/default', {
                                 method: 'PUT',
                                 headers: { 'Authorization': 'Bearer ' + token }
                             }).then(function () { loadAddresses(); });
@@ -1100,7 +1101,7 @@
 
             function loadOrders() {
                 var listEl = document.getElementById('orders-list');
-                fetch('/api/orders/my-orders', {
+                fetch(API_BASE_URL + '/api/orders/my-orders', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 })
                 .then(function (r) { return r.json(); })
@@ -1126,7 +1127,7 @@
 
             function loadReservations() {
                 var listEl = document.getElementById('reservations-list');
-                fetch('/api/reservations/my-reservations', {
+                fetch(API_BASE_URL + '/api/reservations/my-reservations', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 })
                 .then(function (r) { return r.json(); })
@@ -1144,7 +1145,7 @@
                             '<p class="mb-2 text-secondary">Guests: ' + resv.guests + ' Persons &bull; Guest Name: ' + resv.guestName + '</p>' +
                             '<div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">' +
                             '<button type="button" class="btn btn-outline-danger btn-sm view-res-ticket-btn" data-res=\'' + JSON.stringify(resv) + '\'>View Digital Ticket</button>' +
-                            '<a href="/api/reservations/verify/' + encodeURIComponent(resv.bookingId) + '" target="_blank" class="btn btn-sm btn-link text-muted">Verify Online</a>' +
+                            '<a href="' + API_BASE_URL + '/api/reservations/verify/' + encodeURIComponent(resv.bookingId) + '" target="_blank" class="btn btn-sm btn-link text-muted">Verify Online</a>' +
                             '</div></div>';
                     }).join('');
 

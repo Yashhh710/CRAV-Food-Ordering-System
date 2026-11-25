@@ -1,9 +1,13 @@
+
 /**
  * CRAV Client-Side Authentication & Session Helper
  * Manages JWT tokens, user state, prefilling forms, and smart redirects
  */
 (function (window) {
   'use strict';
+
+  var API_BASE_URL = 'https://crav-h5cj.onrender.com';
+  window.CRAV_API_BASE = API_BASE_URL;
 
   var TOKEN_KEY = 'crav_auth_token';
   var REFRESH_KEY = 'crav_refresh_token';
@@ -55,9 +59,8 @@
       sessionStorage.removeItem(REDIRECT_KEY);
     },
 
-    // API Helpers
     register: function (data) {
-      return fetch('/api/auth/register', {
+      return fetch(API_BASE_URL + '/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -66,7 +69,7 @@
 
     verifyOtp: function (email, otp) {
       var self = this;
-      return fetch('/api/auth/verify-otp', {
+      return fetch(API_BASE_URL + '/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email, otp: otp })
@@ -81,7 +84,7 @@
     },
 
     resendOtp: function (email) {
-      return fetch('/api/auth/resend-otp', {
+      return fetch(API_BASE_URL + '/api/auth/resend-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email })
@@ -90,7 +93,7 @@
 
     login: function (email, password) {
       var self = this;
-      return fetch('/api/auth/login', {
+      return fetch(API_BASE_URL + '/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email, password: password })
@@ -107,7 +110,7 @@
     fetchProfile: function () {
       var token = this.getToken();
       if (!token) return Promise.reject(new Error('No token'));
-      return fetch('/api/user/profile', {
+      return fetch(API_BASE_URL + '/api/user/profile', {
         headers: { 'Authorization': 'Bearer ' + token }
       }).then(function (r) { return r.json(); });
     },
@@ -120,7 +123,7 @@
         if (user) {
           a.setAttribute('href', 'dashboard.html');
           a.setAttribute('title', 'My Account (' + (user.firstName || 'User') + ')');
-          // Add small active dot
+
           var icon = a.querySelector('i');
           if (icon) {
             icon.className = 'fa-solid fa-user-check';
@@ -129,6 +132,7 @@
         } else {
           a.setAttribute('href', 'login.html');
           a.setAttribute('title', 'Login / Signup');
+
           var icon = a.querySelector('i');
           if (icon) {
             icon.className = 'fa-regular fa-user';
@@ -139,10 +143,10 @@
     }
   };
 
-  // Run on page load
   document.addEventListener('DOMContentLoaded', function () {
     CravAuth.updateHeaderUi();
   });
 
+  CravAuth.API_BASE_URL = API_BASE_URL;
   window.CravAuth = CravAuth;
 })(window);
