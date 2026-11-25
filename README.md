@@ -128,17 +128,6 @@ Explore the different pages and features of CRAV.
 
 ---
 
-## System Architecture
-
-</div>
-
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/0ca2e00a-7fc6-4290-8168-cfdb15415b74" />
-
-
-<div align="center">
-
----
-
 ## Technology Stack
 
 | Category | Technologies |
@@ -154,6 +143,18 @@ Explore the different pages and features of CRAV.
 | Frontend Hosting | Firebase Hosting |
 | Backend Hosting | Render |
 | Version Control | Git, GitHub |
+
+---
+
+## System Architecture
+
+</div>
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/0ca2e00a-7fc6-4290-8168-cfdb15415b74" />
+
+
+<div align="center">
+
 
 ---
 
