@@ -4,13 +4,13 @@ const nodemailer = require('nodemailer');
 let transporter = null;
 
 function getTransporter() {
-  const host = process.env.SMTP_HOST;
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
-  if (!host || !user || !pass) {
+  if (!user || !pass) {
     throw new Error(
-      'SMTP is not configured. Check SMTP_HOST, SMTP_USER and SMTP_PASS.'
+      'SMTP is not configured. Check SMTP_USER and SMTP_PASS.'
     );
   }
 
@@ -34,28 +34,54 @@ function getTransporter() {
   return transporter;
 }
 
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, character => {
+    const entities = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+
+    return entities[character];
+  });
+}
+
 async function sendOtpEmail(email, otp, firstName = 'Food Lover') {
   try {
     const mailTransporter = getTransporter();
 
-    const safeName = String(firstName).replace(/[<>&"']/g, '');
+    const safeName = escapeHtml(firstName);
+    const cleanEmail = String(email).trim().toLowerCase();
 
-    const from = process.env.EMAIL_FROM ||
-      `"CRAV" <${process.env.SMTP_USER}>`;
+    // Always use the authenticated Gmail account as sender.
+    const from = {
+      name: 'CRAV',
+      address: process.env.SMTP_USER
+    };
 
     const htmlContent = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;background:#fff;border:1px solid #eee;border-radius:12px;">
 
         <div style="text-align:center;margin-bottom:24px;">
-          <h1 style="color:#D90019;margin:0;font-size:28px;letter-spacing:2px;">CRAV</h1>
-          <p style="color:#8F1420;font-size:14px;">From Craving to Doorstep</p>
+          <h1 style="color:#D90019;margin:0;font-size:28px;letter-spacing:2px;">
+            CRAV
+          </h1>
+          <p style="color:#8F1420;font-size:14px;">
+            From Craving to Doorstep
+          </p>
         </div>
 
         <div style="padding:20px;background:#FFF9E9;border-radius:8px;border-left:4px solid #D90019;">
 
-          <h2 style="color:#080808;font-size:18px;">Verify Your Email Address</h2>
+          <h2 style="color:#080808;font-size:18px;">
+            Verify Your Email Address
+          </h2>
 
-          <p style="color:#444;">Hello <strong>${safeName}</strong>,</p>
+          <p style="color:#444;">
+            Hello <strong>${safeName}</strong>,
+          </p>
 
           <p style="color:#444;line-height:1.6;">
             Thank you for registering with CRAV.
@@ -77,6 +103,8 @@ async function sendOtpEmail(email, otp, firstName = 'Food Lover') {
 
         <div style="text-align:center;color:#999;font-size:12px;padding-top:16px;">
           © 2026 CRAV. All rights reserved.
+          <br>
+          Opening Hours: Every Day 11:00 AM - 11:00 PM
         </div>
 
       </div>
@@ -84,11 +112,16 @@ async function sendOtpEmail(email, otp, firstName = 'Food Lover') {
 
     const info = await mailTransporter.sendMail({
       from,
-      to: email,
+      to: cleanEmail,
       subject: `${otp} is your CRAV verification code`,
-      text: `Hello ${safeName}, your CRAV verification code is ${otp}. It expires in 5 minutes.`,
+      text: `Hello ${firstName}, your CRAV verification code is ${otp}. It expires in 5 minutes.`,
       html: htmlContent
     });
+
+    const accepted = (info.accepted || []).some(
+      recipient =>
+        String(recipient).toLowerCase() === cleanEmail
+    );
 
     console.log('CRAV EMAIL RESULT:', {
       messageId: info.messageId,
@@ -96,11 +129,11 @@ async function sendOtpEmail(email, otp, firstName = 'Food Lover') {
       rejected: info.rejected
     });
 
-    if (!info.accepted || !info.accepted.includes(email)) {
+    if (!accepted) {
       throw new Error('SMTP did not accept the recipient.');
     }
 
-    console.log(`CRAV OTP email accepted for ${email}`);
+    console.log(`CRAV OTP email accepted for ${cleanEmail}`);
 
     return {
       success: true,
@@ -122,7 +155,12 @@ async function sendOtpEmail(email, otp, firstName = 'Food Lover') {
 
 async function verifyEmailConnection() {
   const mailTransporter = getTransporter();
-  return await mailTransporter.verify();
+
+  const result = await mailTransporter.verify();
+
+  console.log('CRAV SMTP CONNECTION VERIFIED');
+
+  return result;
 }
 
 module.exports = {
