@@ -1,6 +1,7 @@
 const { Orders, Users } = require('../config/db');
 const { logAudit } = require('../utils/auditLogger');
 const { hashPassword } = require('../utils/password');
+const { loadDeliveryBoys, isOrderActive } = require('../services/deliveryService');
 
 async function getDeliveries(req, res) {
   try {
@@ -34,30 +35,57 @@ async function getDeliveries(req, res) {
 
 async function getDeliveryBoys(req, res) {
   try {
+    const jsonPartners = loadDeliveryBoys();
     const allUsers = Users.find({ role: 'DELIVERY_BOY' });
     const allOrders = Orders.find();
 
-    const deliveryBoys = allUsers.map(boy => {
-      const assignedOrders = allOrders.filter(o => o.deliveryBoy && (o.deliveryBoy.id === boy.id || o.deliveryBoy.name === `${boy.firstName} ${boy.lastName}`.trim()));
-      const activeCount = assignedOrders.filter(o => ['ASSIGNED TO DELIVERY BOY', 'PICKED UP', 'OUT FOR DELIVERY'].includes((o.stage || '').toUpperCase())).length;
+    const partnerMap = new Map();
+    jsonPartners.forEach(p => {
+      partnerMap.set(p.id, {
+        ...p,
+        email: `${p.id}@crav.delivery`,
+        licenseNumber: p.vehicle_number,
+        availability: 'available',
+        status: 'active'
+      });
+    });
+
+    allUsers.forEach(boy => {
+      const fullName = `${boy.firstName} ${boy.lastName}`.trim();
+      if (!partnerMap.has(boy.id)) {
+        partnerMap.set(boy.id, {
+          id: boy.id,
+          firstName: boy.firstName,
+          lastName: boy.lastName,
+          name: fullName,
+          email: boy.email,
+          phone: boy.phone || '+91 90000 00000',
+          image: boy.image || 'assets/media/delivery/db-001.png',
+          vehicle: boy.vehicle || 'Hero Splendor Plus',
+          vehicle_number: boy.licenseNumber || 'MH-46-2024-00918',
+          licenseNumber: boy.licenseNumber || 'MH-46-2024-00918',
+          availability: boy.availability || 'available',
+          rating: boy.rating || 4.8,
+          deliveries: boy.deliveries || 0,
+          experience: boy.experience || '2 yrs',
+          languages: boy.languages || ['Hindi', 'English'],
+          status: boy.status || 'active'
+        });
+      }
+    });
+
+    const deliveryBoys = Array.from(partnerMap.values()).map(boy => {
+      const assignedOrders = allOrders.filter(o => o.deliveryBoy && (o.deliveryBoy.id === boy.id || o.deliveryBoy.name === boy.name));
+      const activeCount = assignedOrders.filter(o => isOrderActive(o)).length;
       const completedCount = assignedOrders.filter(o => (o.stage || '').toUpperCase() === 'DELIVERED').length;
       const failedCount = assignedOrders.filter(o => ['FAILED', 'DELIVERY FAILED'].includes((o.stage || '').toUpperCase())).length;
 
       return {
-        id: boy.id,
-        firstName: boy.firstName,
-        lastName: boy.lastName,
-        name: `${boy.firstName} ${boy.lastName}`.trim(),
-        email: boy.email,
-        phone: boy.phone || '+91 90000 00000',
-        vehicle: boy.vehicle || 'Hero Splendor Plus',
-        licenseNumber: boy.licenseNumber || 'MH-46-2024-00918',
-        availability: boy.availability || 'available', // available, offline, busy
-        rating: boy.rating || 4.8,
+        ...boy,
+        availability: activeCount > 0 ? 'busy' : (boy.availability || 'available'),
         activeOrders: activeCount,
         completedOrders: completedCount,
-        failedOrders: failedCount,
-        status: boy.status || 'active'
+        failedOrders: failedCount
       };
     });
 

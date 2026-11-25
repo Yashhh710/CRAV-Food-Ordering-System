@@ -1,78 +1,53 @@
-const fs = require('fs');
-const path = require('path');
 const { Orders } = require('../config/db');
 const { logAudit } = require('../utils/auditLogger');
-
-let deliveryBoysList = [];
-try {
-  const raw = fs.readFileSync(path.join(__dirname, '../../assets/js/deliveryboy.json'), 'utf-8');
-  const parsed = JSON.parse(raw);
-  deliveryBoysList = parsed.deliveryBoys || [];
-} catch (e) {
-  console.warn('Could not load deliveryboy.json on server:', e.message);
-}
-
-function getDeterministicDeliveryBoy(orderId) {
-  if (!deliveryBoysList.length) return null;
-  let hash = 0;
-  const str = String(orderId || 'CRAV');
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  const index = Math.abs(hash) % deliveryBoysList.length;
-  return deliveryBoysList[index];
-}
-
-const STAGES = [
-  { key: 'confirmed', title: 'Order Confirmed', text: 'We have received and confirmed your order.', sec: 0 },
-  { key: 'preparing', title: 'Preparing Your Food', text: 'Fresh ingredients are being prepared by the chef.', sec: 20 },
-  { key: 'packed', title: 'Food Packed', text: 'Your meal is carefully packed with tamper-proof seal.', sec: 45 },
-  { key: 'out_for_delivery', title: 'Out for Delivery', text: 'Your delivery partner has picked up your order.', sec: 80 },
-  { key: 'arriving_soon', title: 'Arriving Soon', text: 'Delivery partner is within 5 minutes of your location.', sec: 130 },
-  { key: 'delivered', title: 'Delivered', text: 'Delivered! Enjoy your delicious CRAV meal.', sec: 190 }
-];
-
-function calculateStage(createdAt) {
-  const elapsedSec = Math.floor((Date.now() - new Date(createdAt).getTime()) / 1000);
-  let currentStageIndex = 0;
-  for (let i = 0; i < STAGES.length; i++) {
-    if (elapsedSec >= STAGES[i].sec) {
-      currentStageIndex = i;
-    }
-  }
-  return {
-    stageIndex: currentStageIndex,
-    currentStage: STAGES[currentStageIndex].title,
-    currentText: STAGES[currentStageIndex].text,
-    elapsedSec,
-    stages: STAGES.map((s, idx) => ({
-      ...s,
-      completed: idx <= currentStageIndex,
-      active: idx === currentStageIndex
-    }))
-  };
-}
+const {
+  isOrderActive,
+  selectAvailablePartner,
+  buildTrackingInfo
+} = require('../services/deliveryService');
 
 async function createOrder(req, res) {
   try {
-    const { id, items, subtotal, discount, delivery, total, coupon, customer, payment, deliveryBoy } = req.body;
+    const { id, items, subtotal, discount, delivery, total, coupon, customer, payment } = req.body;
 
     if (!items || !items.length || total === undefined) {
       return res.status(400).json({ success: false, message: 'Invalid order data. Cart cannot be empty.' });
     }
 
     const orderId = (id && String(id).trim()) || ('CRV' + Math.floor(100000 + Math.random() * 900000));
-    
-    // Check if order already recorded
+
+    // Check if order already recorded — never overwrite existing deliveryBoy
     const existing = Orders.findById(orderId) || Orders.findOne({ id: orderId });
     if (existing) {
-      return res.json({ success: true, message: 'Order already exists in database.', order: existing });
+      let existingOrder = existing;
+      if (isOrderActive(existingOrder) && (!existingOrder.deliveryBoy || !existingOrder.deliveryBoy.id)) {
+        const partner = selectAvailablePartner(existingOrder.id);
+        if (partner) {
+          existingOrder = Orders.update({ id: existingOrder.id }, {
+            deliveryBoy: partner,
+            updatedAt: new Date().toISOString()
+          }) || existingOrder;
+        }
+      }
+      return res.json({
+        success: true,
+        message: 'Order already exists in database.',
+        order: {
+          ...existingOrder,
+          tracking: buildTrackingInfo(existingOrder)
+        }
+      });
     }
 
-    const assignedBoy = deliveryBoy || getDeterministicDeliveryBoy(orderId);
     const userId = req.user ? req.user.id : (customer?.userId || null);
-    const isPaid = (payment?.status || '').toLowerCase() === 'paid';
+    const paymentStatus = String(payment?.status || 'Pay on delivery');
+    const isPaid = ['paid', 'successful'].includes(paymentStatus.toLowerCase());
+    const isCod = (payment?.method || '').toLowerCase().includes('cash');
+
+    // Confirmed orders (Paid or COD) automatically receive an available partner
+    const initialStage = (isPaid || isCod) ? 'ORDER CONFIRMED' : 'ORDER PLACED';
+    const assignedBoy = (isPaid || isCod) ? selectAvailablePartner(orderId) : null;
+    const nowIso = new Date().toISOString();
 
     const newOrder = {
       id: orderId,
@@ -106,17 +81,25 @@ async function createOrder(req, res) {
         status: payment?.status || 'Pay on delivery',
         isDemo: payment?.isDemo !== undefined ? payment.isDemo : (payment?.method?.includes('QR') || false),
         transactionId: payment?.transactionId || null,
-        paidAt: isPaid ? new Date().toISOString() : null
+        paidAt: isPaid ? nowIso : null
       },
       deliveryBoy: assignedBoy,
-      stage: isPaid ? 'ORDER CONFIRMED' : 'ORDER PLACED',
-      stageIndex: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      stage: initialStage,
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      timeline: [
+        {
+          stage: initialStage,
+          timestamp: nowIso,
+          note: assignedBoy
+            ? `Order placed and assigned to ${assignedBoy.name}`
+            : 'Customer placed order online'
+        }
+      ],
       statusHistory: [
         {
-          stage: isPaid ? 'ORDER CONFIRMED' : 'ORDER PLACED',
-          timestamp: new Date().toISOString(),
+          stage: initialStage,
+          timestamp: nowIso,
           note: 'Customer placed order online'
         }
       ]
@@ -128,14 +111,17 @@ async function createOrder(req, res) {
       actor: req.user || { firstName: newOrder.customer.firstName, lastName: newOrder.customer.lastName, email: newOrder.customer.email, role: 'CUSTOMER' },
       action: 'ORDER_PLACED',
       recordId: newOrder.id,
-      details: `Customer placed order #${newOrder.id} for ₹${newOrder.total} (${newOrder.payment.method})`,
+      details: `Customer placed order #${newOrder.id} for ₹${newOrder.total} (${newOrder.payment.method})${assignedBoy ? ` — Assigned to ${assignedBoy.name}` : ' — Waiting for available partner'}`,
       ip: req.ip
     });
 
     res.status(201).json({
       success: true,
       message: 'Order created and synced to server successfully.',
-      order: newOrder
+      order: {
+        ...newOrder,
+        tracking: buildTrackingInfo(newOrder)
+      }
     });
   } catch (err) {
     console.error('Create order error:', err);
@@ -155,7 +141,8 @@ async function syncLocalOrders(req, res) {
       if (!rawOrder || !rawOrder.id) return;
       const existing = Orders.findById(rawOrder.id) || Orders.findOne({ id: rawOrder.id });
       if (!existing) {
-        const assignedBoy = rawOrder.deliveryBoy || getDeterministicDeliveryBoy(rawOrder.id);
+        const assignedBoy = selectAvailablePartner(rawOrder.id);
+        const createdIso = rawOrder.placedAt ? new Date(rawOrder.placedAt).toISOString() : new Date().toISOString();
         const orderToInsert = {
           id: rawOrder.id,
           userId: req.user ? req.user.id : null,
@@ -176,11 +163,13 @@ async function syncLocalOrders(req, res) {
           payment: rawOrder.payment || { method: 'Cash on Delivery', status: 'Pay on delivery' },
           deliveryBoy: assignedBoy,
           stage: rawOrder.stage || 'ORDER CONFIRMED',
-          stageIndex: 0,
-          createdAt: rawOrder.placedAt ? new Date(rawOrder.placedAt).toISOString() : new Date().toISOString(),
+          createdAt: createdIso,
           updatedAt: new Date().toISOString(),
+          timeline: [
+            { stage: rawOrder.stage || 'ORDER CONFIRMED', timestamp: createdIso, note: 'Synced from customer device' }
+          ],
           statusHistory: [
-            { stage: 'ORDER PLACED', timestamp: rawOrder.placedAt ? new Date(rawOrder.placedAt).toISOString() : new Date().toISOString(), note: 'Synced from customer device' }
+            { stage: 'ORDER PLACED', timestamp: createdIso, note: 'Synced from customer device' }
           ]
         };
         Orders.insert(orderToInsert);
@@ -197,13 +186,30 @@ async function syncLocalOrders(req, res) {
 async function getOrder(req, res) {
   try {
     const { id } = req.params;
-    const order = Orders.findById(id) || Orders.findOne({ id });
+    let order = Orders.findById(id) || Orders.findOne({ id });
 
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
 
-    const stageInfo = calculateStage(order.createdAt);
+    // If order is active and confirmed but still waiting for a partner, assign one if now available.
+    // Never overwrite an existing assignment.
+    if (isOrderActive(order) && (!order.deliveryBoy || !order.deliveryBoy.id)) {
+      const stageUpper = String(order.stage || '').toUpperCase();
+      const paymentStatus = String(order.payment?.status || '').toLowerCase();
+      const isCod = String(order.payment?.method || '').toLowerCase().includes('cash');
+      if (stageUpper !== 'ORDER PLACED' || paymentStatus === 'paid' || paymentStatus === 'successful' || isCod) {
+        const partner = selectAvailablePartner(order.id);
+        if (partner) {
+          order = Orders.update({ id: order.id }, {
+            deliveryBoy: partner,
+            updatedAt: new Date().toISOString()
+          }) || order;
+        }
+      }
+    }
+
+    const stageInfo = buildTrackingInfo(order);
 
     res.json({
       success: true,
@@ -224,7 +230,7 @@ async function getUserOrders(req, res) {
 
     const enriched = orders.map(o => ({
       ...o,
-      tracking: calculateStage(o.createdAt)
+      tracking: buildTrackingInfo(o)
     }));
 
     res.json({ success: true, orders: enriched });

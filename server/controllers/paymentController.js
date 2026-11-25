@@ -1,28 +1,6 @@
-const fs = require('fs');
-const path = require('path');
 const { Orders } = require('../config/db');
 const { generateQrDataUrl } = require('../services/qrService');
-
-let deliveryBoysList = [];
-try {
-  const raw = fs.readFileSync(path.join(__dirname, '../../assets/js/deliveryboy.json'), 'utf-8');
-  const parsed = JSON.parse(raw);
-  deliveryBoysList = parsed.deliveryBoys || [];
-} catch (e) {
-  console.warn('Could not load deliveryboy.json on server:', e.message);
-}
-
-function getDeterministicDeliveryBoy(orderId) {
-  if (!deliveryBoysList.length) return null;
-  let hash = 0;
-  const str = String(orderId || 'CRAV');
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  const index = Math.abs(hash) % deliveryBoysList.length;
-  return deliveryBoysList[index];
-}
+const { selectAvailablePartner } = require('../services/deliveryService');
 
 // In-memory active payment sessions to guarantee lightning-fast polling sync
 const paymentSessions = new Map();
@@ -36,13 +14,13 @@ async function createDemoQrPayment(req, res) {
     }
 
     const orderId = 'CRV-DEMO-' + Math.floor(100000 + Math.random() * 900000);
-    const assignedBoy = getDeterministicDeliveryBoy(orderId);
     const host = req.get('host') || 'localhost:5000';
     const protocol = req.protocol === 'https' ? 'https' : 'http';
     const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
 
     const mobilePayUrl = `${baseUrl}/pay-mobile.html?orderId=${orderId}&amount=${encodeURIComponent(total)}`;
     const qrCodeDataUrl = await generateQrDataUrl(mobilePayUrl);
+    const nowIso = new Date().toISOString();
 
     const newOrder = {
       id: orderId,
@@ -62,10 +40,17 @@ async function createDemoQrPayment(req, res) {
         paidAt: null,
         isDemo: true
       },
-      deliveryBoy: assignedBoy,
-      stage: 'Order Confirmed',
-      stageIndex: 0,
-      createdAt: new Date().toISOString()
+      deliveryBoy: null,
+      stage: 'ORDER PLACED',
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      timeline: [
+        {
+          stage: 'ORDER PLACED',
+          timestamp: nowIso,
+          note: 'Demo QR payment initiated'
+        }
+      ]
     };
 
     Orders.insert(newOrder);
@@ -76,7 +61,7 @@ async function createDemoQrPayment(req, res) {
       orderId,
       amount: total,
       transactionId: null,
-      deliveryBoy: assignedBoy,
+      deliveryBoy: null,
       updatedAt: Date.now()
     });
 
@@ -87,7 +72,7 @@ async function createDemoQrPayment(req, res) {
       status: 'Pending',
       qrCodeDataUrl,
       mobilePayUrl,
-      deliveryBoy: assignedBoy,
+      deliveryBoy: null,
       instructions: 'Scan this QR code using Google Lens or your preferred mobile QR scanner.'
     });
   } catch (err) {
@@ -142,7 +127,20 @@ async function completeDemoPayment(req, res) {
     const txnId = 'TXN-DEMO-' + Date.now().toString(36).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
     const paidAt = new Date().toISOString();
 
-    Orders.update({ id: orderId }, {
+    const assignedBoy = (order.deliveryBoy && order.deliveryBoy.id)
+      ? order.deliveryBoy
+      : selectAvailablePartner(orderId);
+
+    const currentTimeline = Array.isArray(order.timeline) ? [...order.timeline] : [];
+    currentTimeline.push({
+      stage: 'ORDER CONFIRMED',
+      timestamp: paidAt,
+      note: assignedBoy
+        ? `Payment verified (${txnId}) — Assigned to ${assignedBoy.name}`
+        : `Payment verified (${txnId}) — Searching for available delivery partner`
+    });
+
+    const updatedOrder = Orders.update({ id: orderId }, {
       payment: {
         method: 'CRAV Demo QR Payment',
         status: 'Successful',
@@ -150,8 +148,10 @@ async function completeDemoPayment(req, res) {
         paidAt,
         isDemo: true
       },
-      stage: 'Order Confirmed',
-      stageIndex: 0
+      deliveryBoy: assignedBoy,
+      stage: 'ORDER CONFIRMED',
+      timeline: currentTimeline,
+      updatedAt: paidAt
     });
 
     // Update in-memory session for instant polling sync
@@ -160,6 +160,7 @@ async function completeDemoPayment(req, res) {
       orderId,
       amount: order.total,
       transactionId: txnId,
+      deliveryBoy: assignedBoy,
       updatedAt: Date.now()
     });
 
@@ -170,7 +171,8 @@ async function completeDemoPayment(req, res) {
       transactionId: txnId,
       status: 'Successful',
       amount: order.total,
-      paidAt
+      paidAt,
+      deliveryBoy: updatedOrder ? updatedOrder.deliveryBoy : assignedBoy
     });
   } catch (err) {
     console.error('Complete Demo Payment error:', err);

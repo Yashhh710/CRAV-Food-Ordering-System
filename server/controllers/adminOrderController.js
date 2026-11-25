@@ -1,12 +1,15 @@
 const { Orders, Users } = require('../config/db');
 const { logAudit } = require('../utils/auditLogger');
+const { findPartnerById, selectAvailablePartner, buildTrackingInfo } = require('../services/deliveryService');
 
 const VALID_STAGES = [
   'ORDER PLACED',
   'ORDER CONFIRMED',
   'PREPARING',
+  'PREPARING YOUR ORDER',
   'READY FOR PICKUP',
   'ASSIGNED TO DELIVERY BOY',
+  'DELIVERY PARTNER ASSIGNED',
   'PICKED UP',
   'OUT FOR DELIVERY',
   'DELIVERED',
@@ -59,7 +62,10 @@ async function getAllOrders(req, res) {
     const pageNum = Math.max(1, parseInt(page, 10));
     const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10)));
     const startIndex = (pageNum - 1) * limitNum;
-    const paginatedOrders = orders.slice(startIndex, startIndex + limitNum);
+    const paginatedOrders = orders.slice(startIndex, startIndex + limitNum).map(o => ({
+      ...o,
+      tracking: buildTrackingInfo(o)
+    }));
 
     res.json({
       success: true,
@@ -83,7 +89,7 @@ async function getOrderDetails(req, res) {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
 
-    res.json({ success: true, order });
+    res.json({ success: true, order: { ...order, tracking: buildTrackingInfo(order) } });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Server error retrieving order details.' });
   }
@@ -141,10 +147,20 @@ async function updateOrderStatus(req, res) {
       updatedAt: new Date().toISOString()
     };
 
+    if (['CANCELLED', 'REJECTED'].includes(targetStage)) {
+      updatePayload.cancelReason = reason || note || 'Order cancelled by restaurant.';
+    }
+
+    if (['ASSIGNED TO DELIVERY BOY', 'DELIVERY PARTNER ASSIGNED', 'OUT FOR DELIVERY'].includes(targetStage) && (!order.deliveryBoy || !order.deliveryBoy.id)) {
+      const autoPartner = selectAvailablePartner(order.id);
+      if (autoPartner) {
+        updatePayload.deliveryBoy = autoPartner;
+      }
+    }
+
     if (targetStage === 'DELIVERED') {
-      updatePayload['payment.status'] = 'Paid';
       if (order.payment) {
-        updatePayload.payment = { ...order.payment, status: 'Paid', paidAt: new Date().toISOString() };
+        updatePayload.payment = { ...order.payment, status: 'Paid', paidAt: order.payment.paidAt || new Date().toISOString() };
       }
     }
 
@@ -161,7 +177,10 @@ async function updateOrderStatus(req, res) {
     res.json({
       success: true,
       message: `Order status updated to ${targetStage}.`,
-      order: updatedOrder
+      order: {
+        ...updatedOrder,
+        tracking: buildTrackingInfo(updatedOrder)
+      }
     });
   } catch (err) {
     console.error('Update order status error:', err);
@@ -183,28 +202,20 @@ async function assignDeliveryBoy(req, res) {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
 
-    const boyUser = Users.findById(deliveryBoyId);
-    let assignedBoyData = null;
+    const assignedBoyData = findPartnerById(deliveryBoyId) || {
+      id: deliveryBoyId,
+      name: 'Assigned Partner',
+      phone: '+91 90000 00000',
+      image: 'assets/media/delivery/db-001.png',
+      vehicle: 'Motorcycle',
+      vehicle_number: 'MH 46 AB 0001',
+      rating: 4.8,
+      deliveries: 0,
+      experience: '2 yrs',
+      languages: ['Hindi', 'English']
+    };
 
-    if (boyUser) {
-      assignedBoyData = {
-        id: boyUser.id,
-        name: `${boyUser.firstName} ${boyUser.lastName}`.trim(),
-        phone: boyUser.phone || '+91 90000 00000',
-        vehicle: boyUser.vehicle || 'Hero Splendor Plus',
-        rating: boyUser.rating || 4.9
-      };
-    } else {
-      assignedBoyData = {
-        id: deliveryBoyId,
-        name: 'Assigned Partner',
-        phone: '+91 90000 00000',
-        vehicle: 'Motorcycle',
-        rating: 4.8
-      };
-    }
-
-    const currentTimeline = Array.isArray(order.timeline) ? order.timeline : [];
+    const currentTimeline = Array.isArray(order.timeline) ? [...order.timeline] : [];
     currentTimeline.push({
       stage: 'ASSIGNED TO DELIVERY BOY',
       note: `Delivery assigned to partner: ${assignedBoyData.name}`,
@@ -216,9 +227,12 @@ async function assignDeliveryBoy(req, res) {
       timestamp: new Date().toISOString()
     });
 
+    const preDeliveryStages = ['ORDER PLACED', 'ORDER CONFIRMED', 'PREPARING', 'PREPARING YOUR ORDER', 'READY FOR PICKUP'];
+    const currentStageUpper = String(order.stage || '').toUpperCase();
+
     const updated = Orders.update({ id: order.id }, {
       deliveryBoy: assignedBoyData,
-      stage: (order.stage === 'ORDER CONFIRMED' || order.stage === 'ORDER PLACED') ? 'ASSIGNED TO DELIVERY BOY' : order.stage,
+      stage: preDeliveryStages.includes(currentStageUpper) ? 'ASSIGNED TO DELIVERY BOY' : order.stage,
       timeline: currentTimeline,
       updatedAt: new Date().toISOString()
     });
@@ -234,7 +248,10 @@ async function assignDeliveryBoy(req, res) {
     res.json({
       success: true,
       message: `Delivery successfully assigned to ${assignedBoyData.name}.`,
-      order: updated
+      order: {
+        ...updated,
+        tracking: buildTrackingInfo(updated)
+      }
     });
   } catch (err) {
     console.error('Assign delivery boy error:', err);

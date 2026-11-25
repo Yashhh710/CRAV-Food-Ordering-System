@@ -48,7 +48,28 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  'https://crav-food-ordering.web.app',
+  'https://crav-food-ordering.firebaseapp.com',
+  'http://localhost:5000',
+  'http://localhost:5001',
+  'http://127.0.0.1:5000',
+  'http://127.0.0.1:5001'
+];
+if (process.env.FRONTEND_URL) allowedOrigins.push(process.env.FRONTEND_URL);
+if (process.env.BASE_URL) allowedOrigins.push(process.env.BASE_URL);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

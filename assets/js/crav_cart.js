@@ -27,14 +27,15 @@
         FREEDEL:   { type: 'delivery',            min: 0,             label: 'Free delivery' }
     };
 
-    /* Order tracking timeline (6 stages matching production requirements) */
+    /* Order tracking timeline (7 status-driven stages synced with backend) */
     var STAGES = [
-        { key: 'confirmed', title: 'Order Confirmed',      text: 'We have received and confirmed your order.',            at: 0,   icon: 'fa-circle-check' },
-        { key: 'preparing', title: 'Preparing Your Food',  text: 'Your food is being freshly prepared in our kitchen.',   at: 15,  icon: 'fa-utensils' },
-        { key: 'packed',    title: 'Food Packed',          text: 'Packed hot with tamper-proof seal.',                   at: 35,  icon: 'fa-box' },
-        { key: 'out',       title: 'Out for Delivery',     text: 'Your delivery partner is on the way to your doorstep.', at: 65,  icon: 'fa-motorcycle' },
-        { key: 'arriving',  title: 'Arriving Soon',        text: 'Delivery partner is within 2 minutes of your location.',at: 100, icon: 'fa-location-dot' },
-        { key: 'delivered', title: 'Delivered',            text: 'Delivered! Enjoy your delicious CRAV meal.',           at: 140, icon: 'fa-house-chimney' }
+        { key: 'placed',           title: 'Order Placed',              text: 'Your order has been received.',                         icon: 'fa-receipt' },
+        { key: 'confirmed',        title: 'Order Confirmed',           text: 'We have received and confirmed your order.',            icon: 'fa-circle-check' },
+        { key: 'preparing',        title: 'Preparing Your Order',      text: 'Your food is being freshly prepared in our kitchen.',   icon: 'fa-utensils' },
+        { key: 'ready',            title: 'Ready for Pickup',          text: 'Packed hot and ready for pickup.',                      icon: 'fa-box' },
+        { key: 'assigned',         title: 'Delivery Partner Assigned', text: 'A delivery partner has been assigned to your order.',   icon: 'fa-user-check' },
+        { key: 'out_for_delivery', title: 'Out for Delivery',          text: 'Your delivery partner is on the way to your doorstep.', icon: 'fa-motorcycle' },
+        { key: 'delivered',        title: 'Delivered',                 text: 'Delivered! Enjoy your delicious CRAV meal.',            icon: 'fa-house-chimney' }
     ];
 
     var ARROW = '<svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -418,37 +419,33 @@
             customer: f, payment: { method: paymentLabel, status: paid ? 'Paid' : 'Pay on delivery' },
             deliveryBoy: null
         };
-        assignDeliveryBoy(order.id).then(function (boy) {
-            order.deliveryBoy = boy;
-            
-            var token = window.CravAuth ? window.CravAuth.getToken() : null;
-            var headers = { 'Content-Type': 'application/json' };
-            if (token) headers['Authorization'] = 'Bearer ' + token;
+        var token = window.CravAuth ? window.CravAuth.getToken() : null;
+        var headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
 
-            // Save order to server database in real time
-            fetch(API_BASE_URL + '/api/orders', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(order)
-            })
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
-                if (res && res.order) {
-                    order = res.order;
-                }
-            })
-            .catch(function (err) {
-                console.warn('Server order sync notice:', err);
-            })
-            .finally(function () {
-                var orders = load(KEY_ORDERS, []);
-                orders = orders.filter(function (o) { return o.id !== order.id; });
-                orders.unshift(order);
-                save(KEY_ORDERS, orders);
-                form.setAttribute('data-done', '1');
-                clearCart();
-                showOverlay('success', t, order);
-            });
+        // Save order to server database in real time (backend assigns available partner)
+        fetch(API_BASE_URL + '/api/orders', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(order)
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+            if (res && res.order) {
+                order = res.order;
+            }
+        })
+        .catch(function (err) {
+            console.warn('Server order sync notice:', err);
+        })
+        .finally(function () {
+            var orders = load(KEY_ORDERS, []);
+            orders = orders.filter(function (o) { return o.id !== order.id; });
+            orders.unshift(order);
+            save(KEY_ORDERS, orders);
+            form.setAttribute('data-done', '1');
+            clearCart();
+            showOverlay('success', t, order);
         });
     }
 
@@ -565,7 +562,7 @@
     }
 
     function handlePaymentSuccess(o, orderId, txnId, total, t, customer) {
-        // Save order to localStorage
+        // Fetch backend-confirmed order (with backend-assigned delivery partner)
         var order = {
             id: orderId,
             placedAt: Date.now(),
@@ -573,27 +570,35 @@
             subtotal: t.subtotal, discount: t.discount, delivery: t.delivery, total: total, coupon: t.code,
             customer: customer,
             payment: { method: 'CRAV Demo QR Payment', status: 'Paid', transactionId: txnId || 'TXN-DEMO-VERIFIED' },
-            deliveryBoy: null
+            deliveryBoy: null,
+            stage: 'ORDER CONFIRMED'
         };
 
-        assignDeliveryBoy(order.id).then(function (boy) {
-            order.deliveryBoy = boy;
+        var token = window.CravAuth ? window.CravAuth.getToken() : null;
+        var headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
 
-            var token = window.CravAuth ? window.CravAuth.getToken() : null;
-            var headers = { 'Content-Type': 'application/json' };
-            if (token) headers['Authorization'] = 'Bearer ' + token;
-
-            fetch(API_BASE_URL + '/api/orders', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(order)
-            }).catch(function () {});
-
-            var orders = load(KEY_ORDERS, []);
-            orders = orders.filter(function (o) { return o.id !== order.id; });
-            orders.unshift(order);
-            save(KEY_ORDERS, orders);
-        });
+        fetch(API_BASE_URL + '/api/orders/' + encodeURIComponent(orderId))
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (res) {
+                if (res && res.success && res.order) {
+                    return res.order;
+                }
+                return fetch(API_BASE_URL + '/api/orders', {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify(order)
+                }).then(function (r2) { return r2.json(); }).then(function (r2Data) {
+                    return (r2Data && r2Data.order) ? r2Data.order : order;
+                });
+            })
+            .catch(function () { return order; })
+            .then(function (finalOrder) {
+                var orders = load(KEY_ORDERS, []);
+                orders = orders.filter(function (existing) { return existing.id !== finalOrder.id; });
+                orders.unshift(finalOrder);
+                save(KEY_ORDERS, orders);
+            });
 
         // Clear cart
         clearCart();
@@ -627,10 +632,13 @@
         } else if (kind === 'placing') {
             h += '<div class="cc-spinner"></div><h4>Placing your order\u2026</h4>';
         } else {
+            var partnerNote = (order.deliveryBoy && order.deliveryBoy.name)
+                ? 'Your order is confirmed and assigned to <b>' + esc(order.deliveryBoy.name) + '</b>.'
+                : 'Your order is confirmed and we are assigning an available delivery partner.';
             h += '<div class="cc-tick"><i class="fa-solid fa-check"></i></div>' +
                 '<h4>' + (order.payment.status === 'Paid' ? 'Payment successful!' : 'Order placed!') + '</h4>' +
                 '<p class="lead mb-8">Order <b>#' + esc(order.id) + '</b> \u2022 ' + money(order.total) + '</p>' +
-                '<p class="lead mb-24">Your order is confirmed and a delivery partner has been assigned.</p>' +
+                '<p class="lead mb-24">' + partnerNote + '</p>' +
                 '<a href="order-tracking.html?order=' + encodeURIComponent(order.id) + '" class="cus-btn primary w-100">' + btnIcons() + 'Track Order</a>';
         }
         o.innerHTML = h + '</div>';
@@ -661,8 +669,6 @@
     }
 
     /* ================= order tracking ================= */
-    var trackTimer;
-    var searchBoyTimer1, searchBoyTimer2, searchBoyTimer3;
 
     window.closeMobileCallError = function () {
         var overlays = document.querySelectorAll('#cc-mobile-error-overlay, .cc-mobile-error-overlay');
@@ -752,39 +758,67 @@
 
     function getOrders() { var o = load(KEY_ORDERS, []); return Array.isArray(o) ? o : []; }
 
+    function resolveOrderTracking(order) {
+        if (order && order.tracking && typeof order.tracking.stageIndex === 'number') {
+            return order.tracking;
+        }
+        var s = String((order && order.stage) || 'ORDER PLACED').trim().toUpperCase();
+        var isCancelled = (s === 'CANCELLED' || s === 'REJECTED');
+        var isFailed = (s === 'FAILED' || s === 'DELIVERY FAILED');
+        var idx = 0;
+        if (s === 'ORDER PLACED') idx = 0;
+        else if (s === 'ORDER CONFIRMED') idx = 1;
+        else if (s === 'PREPARING' || s === 'PREPARING YOUR ORDER') idx = 2;
+        else if (s === 'READY FOR PICKUP' || s === 'FOOD PACKED') idx = 3;
+        else if (s === 'ASSIGNED TO DELIVERY BOY' || s === 'DELIVERY PARTNER ASSIGNED' || s === 'ACCEPTED') idx = 4;
+        else if (s === 'PICKED UP' || s === 'OUT FOR DELIVERY' || s === 'ARRIVING SOON') idx = 5;
+        else if (s === 'DELIVERED') idx = 6;
+        else if (!isCancelled && !isFailed) idx = 1;
+
+        var hasPartner = !!(order && order.deliveryBoy && order.deliveryBoy.id);
+        return {
+            stageIndex: (isCancelled || isFailed) ? -1 : idx,
+            currentStage: isCancelled ? 'Order Cancelled' : (isFailed ? 'Delivery Failed' : STAGES[idx].title),
+            currentText: isCancelled ? (order.cancelReason || 'This order has been cancelled.') : (isFailed ? (order.failureReason || 'Delivery attempt failed.') : STAGES[idx].text),
+            isCancelled: isCancelled,
+            isFailed: isFailed,
+            isDelivered: !isCancelled && !isFailed && idx === 6,
+            waitingForPartner: !isCancelled && !isFailed && !hasPartner
+        };
+    }
+
     function initTracking() {
         var root = $('#tracking-root');
         if (!root) return;
         var orders = getOrders();
         var wanted = new URLSearchParams(location.search).get('order');
+        var trackingLiveTimer = null;
+        var pollSeq = 0;
+        var lastPaintedUpdatedAt = 0;
+        var activeOrderId = wanted || (orders[0] && orders[0].id) || null;
 
-        // If an order ID is provided, try loading from server first to ensure 100% device sync
-        if (wanted) {
-            fetch(API_BASE_URL + '/api/orders/' + encodeURIComponent(wanted))
-                .then(function (r) { return r.json(); })
-                .then(function (res) {
-                    if (res && res.success && res.order) {
-                        var serverOrder = res.order;
-                        if (!serverOrder.deliveryBoy) {
-                            assignDeliveryBoy(serverOrder.id).then(function (b) {
-                                serverOrder.deliveryBoy = b;
-                                syncAndPaint(serverOrder);
-                            });
-                        } else {
-                            syncAndPaint(serverOrder);
-                        }
-                    } else {
-                        fallbackLocalTracking();
-                    }
-                })
-                .catch(function () {
-                    fallbackLocalTracking();
-                });
-        } else {
-            fallbackLocalTracking();
+        function setPollNotice(msg, isError) {
+            var el = $('#cc-poll-status');
+            if (!el) return;
+            if (!msg) {
+                el.style.display = 'none';
+                el.textContent = '';
+                return;
+            }
+            el.style.display = 'block';
+            el.style.color = isError ? '#b91c1c' : '#64748b';
+            el.textContent = msg;
         }
 
         function syncAndPaint(serverOrder) {
+            if (!serverOrder || !serverOrder.id) return;
+            var serverTs = serverOrder.updatedAt ? new Date(serverOrder.updatedAt).getTime() : 0;
+            if (lastPaintedUpdatedAt && serverTs && serverTs < lastPaintedUpdatedAt) {
+                return;
+            }
+            if (serverTs) lastPaintedUpdatedAt = serverTs;
+            activeOrderId = serverOrder.id;
+
             var found = false;
             orders = orders.map(function (o) {
                 if (o.id === serverOrder.id) { found = true; return serverOrder; }
@@ -793,96 +827,95 @@
             if (!found) orders.unshift(serverOrder);
             save(KEY_ORDERS, orders);
             paintTracking(root, serverOrder, orders);
+            setPollNotice('', false);
+
+            var tr = resolveOrderTracking(serverOrder);
+            if (tr.isDelivered || tr.isCancelled || tr.isFailed) {
+                clearInterval(trackingLiveTimer);
+                trackingLiveTimer = null;
+            }
         }
 
         function fallbackLocalTracking() {
             var order = null;
             orders.forEach(function (o) { if (!order && (wanted ? o.id === wanted : true)) order = o; });
             if (order) {
-                // Ensure order is immediately saved to server database
+                activeOrderId = order.id;
+                paintTracking(root, order, orders);
+                // Sync local order with backend so backend can assign/persist
                 fetch(API_BASE_URL + '/api/orders', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(order)
-                }).catch(function () {});
-            } else {
-                order = {
-                    id: wanted || 'ORD-742918',
-                    placedAt: Date.now() - 40000,
-                    items: [
-                        { id: 1, name: 'Zinger Burger', price: 159, qty: 2 },
-                        { id: 5, name: 'Peri Peri Fries', price: 99, qty: 1 },
-                        { id: 12, name: 'Cold Coffee', price: 89, qty: 1 }
-                    ],
-                    subtotal: 506,
-                    delivery: 0,
-                    coupon: 'CRAV50',
-                    discount: 50,
-                    total: 456,
-                    payment: { method: 'UPI / Online', status: 'Paid' },
-                    customer: {
-                        firstName: 'Aarav',
-                        lastName: 'Sharma',
-                        phone: '+91 98200 55432',
-                        address: 'Flat 402, Royal Residency, Linking Road',
-                        state: 'Mumbai',
-                        zip: '400050'
-                    },
-                    deliveryBoy: null
-                };
-                orders = [order];
-                save(KEY_ORDERS, orders);
-                fetch(API_BASE_URL + '/api/orders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(order)
-                }).catch(function () {});
-            }
-            if (!order.deliveryBoy) {
-                assignDeliveryBoy(order.id).then(function (boy) {
-                    if (boy) { order.deliveryBoy = boy; save(KEY_ORDERS, orders.map(function (o) { return o.id === order.id ? order : o; })); }
-                    paintTracking(root, order, orders);
-                });
-            } else paintTracking(root, order, orders);
-        }
-
-        // Live polling on tracking page to sync with admin changes
-        var trackingLiveTimer = setInterval(function () {
-            var currWanted = new URLSearchParams(location.search).get('order');
-            if (currWanted) {
-                fetch(API_BASE_URL + '/api/orders/' + encodeURIComponent(currWanted))
+                })
                     .then(function (r) { return r.json(); })
                     .then(function (res) {
-                        if (res && res.success && res.order) {
-                            syncAndPaint(res.order);
-                        }
+                        if (res && res.success && res.order) syncAndPaint(res.order);
                     })
-                    .catch(function () {});
+                    .catch(function () {
+                        setPollNotice('Unable to reach server. Retrying...', true);
+                    });
+            } else {
+                root.innerHTML = '<div class="cc-empty text-center py-5">' +
+                    '<h3 class="mb-12">No Active Order Found</h3>' +
+                    '<p class="lead text-muted mb-24">We could not find an order to track' + (wanted ? ' for #' + esc(wanted) : '') + '.</p>' +
+                    '<a href="menu.html" class="cus-btn primary">' + btnIcons() + 'Browse Menu</a></div>';
             }
-        }, 3500);
-    }
+        }
 
-    function stageIndex(sec) {
-        var idx = 0;
-        STAGES.forEach(function (s, i) { if (sec >= s.at) idx = i; });
-        return idx;
-    }
-    function progressPct(sec) {
-        var last = STAGES.length - 1;
-        if (sec >= STAGES[last].at) return 100;
-        var i = stageIndex(sec), a = STAGES[i].at, b = STAGES[i + 1].at;
-        return Math.min(100, ((i + (sec - a) / (b - a)) / last) * 100);
-    }
-    function fmtClock(s) {
-        s = Math.max(0, Math.ceil(s));
-        var m = Math.floor(s / 60), r = s % 60;
-        return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r;
+        function fetchLatestOrder(orderId, isInitial) {
+            if (!orderId) return;
+            var mySeq = ++pollSeq;
+            fetch(API_BASE_URL + '/api/orders/' + encodeURIComponent(orderId))
+                .then(function (r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function (res) {
+                    if (mySeq < pollSeq) return; // Ignore stale out-of-order response
+                    if (res && res.success && res.order) {
+                        syncAndPaint(res.order);
+                    } else if (isInitial) {
+                        fallbackLocalTracking();
+                    }
+                })
+                .catch(function () {
+                    if (mySeq < pollSeq) return;
+                    if (isInitial) {
+                        fallbackLocalTracking();
+                    } else {
+                        setPollNotice('Connection interrupted — retrying automatically...', true);
+                    }
+                });
+        }
+
+        if (activeOrderId) {
+            fetchLatestOrder(activeOrderId, true);
+        } else {
+            fallbackLocalTracking();
+        }
+
+        // Poll backend every 5 seconds until Delivered or Cancelled
+        trackingLiveTimer = setInterval(function () {
+            var currWanted = new URLSearchParams(location.search).get('order') || activeOrderId;
+            if (currWanted) {
+                fetchLatestOrder(currWanted, false);
+            }
+        }, 5000);
     }
 
     function paintTracking(root, order, orders) {
         var boy = order.deliveryBoy;
+        var tracking = resolveOrderTracking(order);
+        var idx = tracking.stageIndex;
+
         var steps = STAGES.map(function (s, i) {
-            return '<li class="cc-step" data-i="' + i + '"><span class="cc-dot"><i class="fa-solid ' + s.icon + '"></i></span>' +
+            var cls = 'cc-step';
+            if (!tracking.isCancelled && !tracking.isFailed) {
+                if (i < idx || (i === idx && idx === STAGES.length - 1)) cls += ' done';
+                else if (i === idx && idx !== STAGES.length - 1) cls += ' current';
+            }
+            return '<li class="' + cls + '" data-i="' + i + '"><span class="cc-dot"><i class="fa-solid ' + s.icon + '"></i></span>' +
                 '<div class="cc-step-text"><h6>' + s.title + '</h6><p>' + s.text + '</p></div></li>';
         }).join('');
 
@@ -898,80 +931,66 @@
             '<div class="cc-radar-center-icon"><i class="fa-solid fa-person-biking"></i></div>' +
             '</div>' +
             '<h5 class="mb-8">Searching for Delivery Partner<span class="cc-dots">...</span></h5>' +
-            '<p class="lead text-muted mb-16" style="font-size: 14px;">Contacting nearest delivery riders in your zone</p>' +
+            '<p class="lead text-muted mb-16" style="font-size: 14px;">Finding an available delivery rider for your order</p>' +
             '<div class="cc-search-status-bar"><div class="cc-search-progress-bar"></div></div>' +
-            '<p class="cc-search-counter-text mt-12 text-muted" id="cc-search-status-msg" style="font-size: 13px;">Locating nearby partner...</p>' +
+            '<p class="cc-search-counter-text mt-12 text-muted" id="cc-search-status-msg" style="font-size: 13px;">Checking nearby available partners...</p>' +
+            '</div>';
+
+        var cancelledPartnerHtml = '<div class="cc-card cc-boy text-center py-4">' +
+            '<div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;color:#dc2626;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;"><i class="fa-solid fa-ban"></i></div>' +
+            '<h5 class="mb-8">' + esc(tracking.currentStage) + '</h5>' +
+            '<p class="lead text-muted mb-0" style="font-size:14px;">' + esc(tracking.currentText) + '</p>' +
             '</div>';
 
         var partnerDetailsHtml = boy ? ('<div class="cc-card cc-boy cc-fade-in">' +
             '<div class="cc-partner-found-badge mb-16"><i class="fa-solid fa-circle-check"></i> Delivery Partner Assigned</div>' +
             '<h6 class="cc-card-title">YOUR DELIVERY PARTNER</h6>' +
-            '<div class="cc-boy-top"><img src="' + esc(boy.image) + '" alt="' + esc(boy.name) + '"><div><h5>' + esc(boy.name) + '</h5>' +
-            '<p class="cc-rating"><i class="fa-solid fa-star"></i> ' + esc(boy.rating) + ' \u2022 ' + esc(boy.deliveries) + ' deliveries</p></div></div>' +
+            '<div class="cc-boy-top"><img src="' + esc(boy.image || 'assets/media/delivery/db-001.png') + '" alt="' + esc(boy.name) + '"><div><h5>' + esc(boy.name) + '</h5>' +
+            '<p class="cc-rating"><i class="fa-solid fa-star"></i> ' + esc(boy.rating || 4.8) + ' \u2022 ' + esc(boy.deliveries || 0) + ' deliveries</p></div></div>' +
             '<ul class="cc-boy-info unstyled">' +
-            '<li><i class="fa-solid fa-motorcycle"></i><span>' + esc(boy.vehicle) + ' \u2022 ' + esc(boy.vehicle_number) + '</span></li>' +
-            '<li><i class="fa-solid fa-clock"></i><span>Experience: ' + esc(boy.experience) + '</span></li>' +
-            '<li><i class="fa-solid fa-user"></i><span>Speaks ' + esc((boy.languages || []).join(', ')) + '</span></li>' +
-            '<li><i class="fa-solid fa-phone"></i><span>' + esc(boy.phone) + '</span></li></ul>' +
+            '<li><i class="fa-solid fa-motorcycle"></i><span>' + esc(boy.vehicle || 'Motorcycle') + ' \u2022 ' + esc(boy.vehicle_number || '') + '</span></li>' +
+            '<li><i class="fa-solid fa-clock"></i><span>Experience: ' + esc(boy.experience || '2 yrs') + '</span></li>' +
+            '<li><i class="fa-solid fa-user"></i><span>Speaks ' + esc((boy.languages || ['Hindi', 'English']).join(', ')) + '</span></li>' +
+            '<li><i class="fa-solid fa-phone"></i><span>' + esc(boy.phone || '') + '</span></li></ul>' +
             '<button type="button" class="cus-btn dark w-100 cc-call-partner-btn">' + btnIcons() + 'Call Delivery Partner</button></div>')
-            : '<div class="cc-card"><h6 class="cc-card-title">YOUR DELIVERY PARTNER</h6><p class="lead">A delivery partner will be assigned shortly.</p></div>';
+            : searchingHtml;
+
+        var boyColHtml = (tracking.isCancelled || tracking.isFailed) ? cancelledPartnerHtml : partnerDetailsHtml;
 
         var c = order.customer || {};
-        var itemsHtml = order.items.map(function (i) {
+        var itemsHtml = (order.items || []).map(function (i) {
             return '<div class="d-flex justify-content-between mb-8"><p class="lead color-black">' + esc(i.name) + ' \u00D7 ' + i.qty + '</p><p class="lead">' + money(i.price * i.qty) + '</p></div>';
         }).join('');
 
+        var progressPercent = (tracking.isCancelled || tracking.isFailed)
+            ? 0
+            : Math.min(100, Math.max(0, (idx / (STAGES.length - 1)) * 100));
+
+        var statusBadgeText = tracking.isCancelled
+            ? 'Cancelled'
+            : (tracking.isFailed ? 'Failed' : (tracking.isDelivered ? 'Delivered' : tracking.currentStage));
+
+        var progressSectionHtml = (tracking.isCancelled || tracking.isFailed)
+            ? '<div class="cc-card cc-progress-card text-center py-4">' +
+              '<div style="color:#dc2626;font-weight:700;font-size:18px;margin-bottom:6px;"><i class="fa-solid fa-circle-xmark me-2"></i>' + esc(tracking.currentStage) + '</div>' +
+              '<p class="lead text-muted mb-0">' + esc(tracking.currentText) + '</p></div>'
+            : '<div class="cc-card cc-progress-card"><div class="cc-bar"><div class="cc-bar-fill" id="cc-bar-fill" style="--p: ' + progressPercent + '%;"></div></div><ol class="cc-steps unstyled">' + steps + '</ol></div>';
+
         root.innerHTML = chips +
-            '<div class="cc-track-head"><div><p class="cc-kicker">ORDER #' + esc(order.id) + '</p><h3 id="cc-status-title">\u2026</h3><p class="lead" id="cc-status-text"></p></div>' +
-            '<div class="cc-eta"><span>Estimated arrival</span><b id="cc-eta">--:--</b></div></div>' +
-            '<div class="cc-card cc-progress-card"><div class="cc-bar"><div class="cc-bar-fill" id="cc-bar-fill"></div></div><ol class="cc-steps unstyled">' + steps + '</ol></div>' +
-            '<div class="row"><div class="col-lg-5 mb-32" id="cc-boy-col">' + searchingHtml + '</div><div class="col-lg-7 mb-32"><div class="cc-card"><h6 class="cc-card-title">ORDER DETAILS</h6>' +
+            '<div class="cc-track-head"><div><p class="cc-kicker">ORDER #' + esc(order.id) + '</p><h3 id="cc-status-title">' + esc(tracking.currentStage) + '</h3><p class="lead" id="cc-status-text">' + esc(tracking.currentText) + '</p>' +
+            '<p id="cc-poll-status" style="display:none;font-size:12px;margin-top:4px;"></p></div>' +
+            '<div class="cc-eta"><span>Order Status</span><b id="cc-eta">' + esc(statusBadgeText) + '</b></div></div>' +
+            progressSectionHtml +
+            '<div class="row"><div class="col-lg-5 mb-32" id="cc-boy-col">' + boyColHtml + '</div><div class="col-lg-7 mb-32"><div class="cc-card"><h6 class="cc-card-title">ORDER DETAILS</h6>' +
             itemsHtml + '<div class="vr-line mb-16 mt-16"></div>' +
             '<div class="d-flex justify-content-between mb-8"><p class="lead">Subtotal</p><p class="lead">' + money(order.subtotal) + '</p></div>' +
             '<div class="d-flex justify-content-between mb-8"><p class="lead">Delivery</p><p class="lead">' + (order.delivery ? money(order.delivery) : 'FREE') + '</p></div>' +
             (order.discount ? '<div class="d-flex justify-content-between mb-8"><p class="lead">Coupon (' + esc(order.coupon) + ')</p><p class="lead cc-green">-' + money(order.discount) + '</p></div>' : '') +
             '<div class="d-flex justify-content-between mb-24"><h5 class="color-primary">TOTAL</h5><h5 class="color-primary">' + money(order.total) + '</h5></div>' +
-            '<div class="cc-meta"><div><b>Payment</b><span>' + esc(order.payment.method) + ' \u2022 ' + esc(order.payment.status) + '</span></div>' +
+            '<div class="cc-meta"><div><b>Payment</b><span>' + esc((order.payment && order.payment.method) || '') + ' \u2022 ' + esc((order.payment && order.payment.status) || '') + '</span></div>' +
             '<div><b>Deliver to</b><span>' + esc([c.firstName, c.lastName].join(' ').trim()) + ', ' + esc([c.address, c.address2, c.state, c.zip].filter(Boolean).join(', ')) + '</span></div>' +
-            '<div><b>Phone</b><span>' + esc(c.phone) + '</span></div></div></div></div></div>' +
+            '<div><b>Phone</b><span>' + esc(c.phone || '') + '</span></div></div></div></div></div>' +
             '<a href="shop-grid.html" class="cus-btn primary">' + btnIcons() + 'Order Something Else</a>';
-
-        clearTimeout(searchBoyTimer1);
-        clearTimeout(searchBoyTimer2);
-        clearTimeout(searchBoyTimer3);
-
-        var boyCol = $('#cc-boy-col');
-        var msgEl = $('#cc-search-status-msg');
-        searchBoyTimer1 = setTimeout(function () {
-            if (msgEl) msgEl.textContent = 'Found riders in your area, confirming pickup...';
-        }, 2200);
-        searchBoyTimer2 = setTimeout(function () {
-            if (msgEl) msgEl.textContent = 'Partner accepting order...';
-        }, 4400);
-        searchBoyTimer3 = setTimeout(function () {
-            if (boyCol) {
-                boyCol.innerHTML = partnerDetailsHtml;
-                showToast('Delivery Partner Found! ' + esc(boy ? boy.name : '') + ' has accepted your order.');
-            }
-        }, 6000);
-
-        function tick() {
-            var sec = (Date.now() - order.placedAt) / 1000;
-            var idx = stageIndex(sec);
-            $$('.cc-step', root).forEach(function (li, i) {
-                li.classList.toggle('done', i < idx || (i === idx && idx === STAGES.length - 1));
-                li.classList.toggle('current', i === idx && idx !== STAGES.length - 1);
-            });
-            $('#cc-bar-fill').style.setProperty('--p', progressPct(sec) + '%');
-            $('#cc-status-title').textContent = STAGES[idx].title;
-            $('#cc-status-text').textContent = STAGES[idx].text;
-            var left = STAGES[STAGES.length - 1].at - sec;
-            $('#cc-eta').textContent = left > 0 ? fmtClock(left) : 'Delivered';
-            if (left <= 0) clearInterval(trackTimer);
-        }
-        tick();
-        clearInterval(trackTimer);
-        trackTimer = setInterval(tick, 1000);
     }
 
     /* ================= add-to-cart from product cards ================= */
