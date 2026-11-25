@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>CRAV | My Account Dashboard</title>
+
+    <link rel="shortcut icon" type="image/png" href="assets/models/logo.png">
+    <link rel="icon" type="image/png" href="assets/models/logo.png">
+    <link rel="stylesheet" href="assets/css/vendor/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/vendor/all.min.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="assets/css/crav_cart.css">
+
+    <style>
+        .dash-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+        }
+        .dash-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            background: #fff;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .dash-nav-btn:hover, .dash-nav-btn.active {
+            background: #D90019;
+            color: #fff;
+            border-color: #D90019;
+        }
+        .dash-tab-pane { display: none; }
+        .dash-tab-pane.active { display: block; }
+        .address-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .address-box.is-default {
+            border-color: #D90019;
+            background: #fffafa;
+        }
+        .badge-default {
+            background: #D90019;
+            color: #fff;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .order-history-item {
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .ticket-modal-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 480px;
+            width: 100%;
+            border-top: 6px solid #D90019;
+            text-align: center;
+        }
+    </style>
+
+    <style id="crav-dashboard-redesign">
+        :root {
+            --crav-red: #D90019;
+            --crav-burgundy: #8F1420;
+            --crav-cream: #FFF9E9;
+            --crav-gold: #F5B900;
+            --crav-ink: #171717;
+            --crav-muted: #77716c;
+            --crav-line: #eee7df;
+            --crav-surface: #ffffff;
+            --crav-shadow: 0 18px 55px rgba(40, 24, 18, .075);
+        }
+
+        body {
+            background: #faf8f5;
+            color: var(--crav-ink);
+            font-family: inherit;
+        }
+
+        .page-content {
+            background:
+                radial-gradient(circle at 8% 3%, rgba(245,185,0,.10), transparent 25rem),
+                radial-gradient(circle at 95% 12%, rgba(217,0,25,.055), transparent 27rem),
+                #faf8f5 !important;
+            min-height: 85vh !important;
+            padding-top: 58px !important;
+            padding-bottom: 72px !important;
+        }
+
+        .page-content > .container {
+            max-width: 1240px;
+        }
+
+        .dash-card {
+            background: rgba(255,255,255,.94);
+            border: 1px solid rgba(235,226,216,.9);
+            border-radius: 22px;
+            padding: 30px;
+            box-shadow: var(--crav-shadow);
+            margin-bottom: 22px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .col-lg-3 > .dash-card:first-child {
+            padding: 30px 22px;
+            background: linear-gradient(145deg, #fff 0%, #fffaf0 100%);
+        }
+
+        #dash-user-name {
+            color: var(--crav-ink);
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -.35px;
+            margin-top: 4px;
+        }
+
+        #dash-user-email {
+            color: var(--crav-muted) !important;
+            overflow-wrap: anywhere;
+            margin-bottom: 14px;
+        }
+
+        #dash-verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 30px;
+            background: #eaf8ef !important;
+            color: #168044 !important;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .35px;
+        }
+
+        .dash-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            width: 100%;
+            min-height: 49px;
+            padding: 13px 15px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: transparent;
+            color: #514b47;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: left;
+            margin-bottom: 6px;
+            transition: background .2s ease, color .2s ease, transform .2s ease, border-color .2s ease;
+        }
+
+        .dash-nav-btn i {
+            width: 19px;
+            text-align: center;
+            color: #9b918a;
+            transition: color .2s ease;
+        }
+
+        .dash-nav-btn:hover {
+            background: #fff5f2;
+            border-color: #f6d8d6;
+            color: var(--crav-red);
+            transform: translateX(2px);
+        }
+
+        .dash-nav-btn:hover i { color: var(--crav-red); }
+
+        .dash-nav-btn.active {
+            background: linear-gradient(110deg, var(--crav-red), #b90018);
+            color: #fff;
+            border-color: var(--crav-red);
+            box-shadow: 0 8px 20px rgba(217,0,25,.18);
+        }
+
+        .dash-nav-btn.active i { color: #fff; }
+
+        .dash-nav-btn#dash-logout-btn {
+            margin-top: 12px;
+            border-top: 1px solid var(--crav-line);
+            border-radius: 0 0 12px 12px;
+            padding-top: 17px;
+            color: #c62828;
+        }
+
+        .dash-nav-btn#dash-logout-btn:hover {
+            background: #fff0f0;
+            border-color: #f4d1d1;
+            color: #a91616;
+        }
+
+        .dash-tab-pane { display: none; animation: cravPaneIn .28s ease both; }
+        .dash-tab-pane.active { display: block; }
+
+        @keyframes cravPaneIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dash-tab-pane h4 {
+            color: var(--crav-ink) !important;
+            font-size: clamp(21px, 2vw, 26px);
+            font-weight: 850;
+            letter-spacing: -.65px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--crav-line);
+        }
+
+        .dash-tab-pane h5, .dash-tab-pane h6 {
+            color: var(--crav-ink);
+            font-weight: 800;
+        }
+
+        .form-label, .dash-tab-pane label {
+            display: inline-block;
+            color: #39332f;
+            font-size: 13px;
+            font-weight: 750;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            min-height: 48px;
+            padding: 11px 14px;
+            border: 1px solid #e8e1da;
+            border-radius: 11px;
+            background: #fff;
+            color: var(--crav-ink);
+            font-size: 14px;
+            box-shadow: none;
+            transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+        }
+
+        .form-control:focus {
+            border-color: rgba(217,0,25,.55);
+            box-shadow: 0 0 0 4px rgba(217,0,25,.08);
+            background: #fff;
+        }
+
+        .form-control:disabled {
+            background: #f6f3ef;
+            color: #817a73;
+            cursor: not-allowed;
+        }
+
+        .dash-card .cus-btn,
+        .dash-card button.cus-btn {
+            min-height: 44px;
+            border-radius: 11px;
+            padding: 11px 20px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: .15px;
+            transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+        }
+
+        .dash-card .cus-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 20px rgba(217,0,25,.15);
+        }
+
+        .dash-card .cus-btn.dark {
+            background: var(--crav-ink);
+            border-color: var(--crav-ink);
+            color: #fff;
+        }
+
+        .dash-card .cus-btn.dark:hover {
+            background: var(--crav-red);
+            border-color: var(--crav-red);
+        }
+
+        .dash-card .cus-btn.primary {
+            background: var(--crav-red);
+            border-color: var(--crav-red);
+            color: #fff;
+        }
+
+        .dash-card .cus-btn.outline {
+            border: 1px solid #e8c5c3;
+            color: var(--crav-red);
+            background: #fff;
+        }
+
+        .dash-card .cus-btn.outline:hover {
+            background: var(--crav-red);
+            color: #fff;
+        }
+
+        .address-box, .order-history-item {
+            border: 1px solid var(--crav-line);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+            background: #fff;
+            transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        .address-box:hover, .order-history-item:hover {
+            border-color: #efc7c7;
+            box-shadow: 0 10px 28px rgba(40,24,18,.055);
+            transform: translateY(-1px);
+        }
+
+        .address-box.is-default {
+            border-color: rgba(217,0,25,.4);
+            background: linear-gradient(120deg, #fffafa, #fff);
+        }
+
+        .badge-default {
+            background: var(--crav-red);
+            color: #fff;
+            font-size: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 850;
+            letter-spacing: .5px;
+        }
+
+        #add-addr-card {
+            border: 1px solid #f0d5d1 !important;
+            border-radius: 16px !important;
+            background: #fffaf8 !important;
+        }
+
+        #add-addr-card input[type="checkbox"] {
+            accent-color: var(--crav-red);
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        .order-history-item .badge,
+        .dash-tab-pane .badge {
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .25px;
+        }
+
+        .dash-tab-pane .btn-outline-primary {
+            color: var(--crav-red);
+            border-color: #e6b9b9;
+        }
+
+        .dash-tab-pane .btn-outline-primary:hover {
+            background: var(--crav-red);
+            border-color: var(--crav-red);
+            color: #fff;
+        }
+
+        .dash-tab-pane .btn-outline-danger {
+            border-radius: 9px;
+        }
+
+        .dash-tab-pane a.color-primary {
+            color: var(--crav-red) !important;
+            font-weight: 750;
+        }
+
+        #prof-status, #pass-status {
+            border: 0;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        #cc-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15,12,10,.66);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        #cc-overlay.show { display: flex; }
+
+        .ticket-modal-card {
+            background: #fff;
+            border: 1px solid rgba(255,255,255,.5);
+            border-radius: 22px;
+            padding: 30px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-top: 5px solid var(--crav-red);
+            box-shadow: 0 25px 80px rgba(0,0,0,.25);
+            text-align: center;
+        }
+
+        .footer-main {
+            background: #111 !important;
+            border-top: 3px solid var(--crav-red);
+        }
+
+        .footer-main p {
+            color: rgba(255,255,255,.75);
+            font-size: 13px;
+            letter-spacing: .2px;
+        }
+
+        @media (max-width: 991px) {
+            .page-content { padding-top: 38px !important; }
+            .dash-card { padding: 24px; }
+            .col-lg-3 > .dash-card:nth-child(2) {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 7px;
+            }
+            .dash-nav-btn { margin: 0; font-size: 12px; padding: 12px 10px; }
+            .dash-nav-btn#dash-logout-btn { margin-top: 0; border-top: 0; }
+        }
+
+        @media (max-width: 575px) {
+            .page-content { padding: 28px 0 45px !important; }
+            .dash-card { padding: 20px 16px; border-radius: 17px; }
+            .col-lg-3 > .dash-card:nth-child(2) { grid-template-columns: 1fr 1fr; }
+            .dash-nav-btn { gap: 8px; font-size: 11px; min-height: 46px; }
+            .dash-tab-pane h4 { font-size: 20px; }
+            .dash-tab-pane .d-flex.justify-content-between {
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+            .dash-tab-pane .d-flex.justify-content-between > * { max-width: 100%; }
+            .address-box, .order-history-item { padding: 15px; }
+            .ticket-modal-card { padding: 22px 17px; }
+            .dash-card .cus-btn { padding: 10px 14px; }
+        }
+
+        @media print {
+            body * { visibility: hidden !important; }
+            #cc-overlay, #cc-overlay * { visibility: visible !important; }
+            #cc-overlay {
+                display: flex !important;
+                position: absolute;
+                inset: 0;
+                background: #fff;
+                padding: 0;
+            }
+            .ticket-modal-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                max-height: none;
+                overflow: visible;
+            }
+            .ticket-modal-card button { display: none !important; }
+        }
+    </style>
+
+</head>
+<body id="body">
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loading">
+            <span data-text="C">C</span>
+            <span data-text="R">R</span>
+            <span data-text="A">A</span>
+            <span data-text="V">V</span>
+        </div>
+    </div>
+
+    <div id="smooth-wrapper">
+        <div id="smooth-content" class="x-hidden">
+            <main>
+                <!-- Hero Section Start -->
+                <section class="inner-page-banner">
+                    <!-- Header start -->
+                    <header id="ui-header">
+                        <div class="ui-header-inner container-fluid">
+
+                            <div class="ui-header-col">
+                                <div class="ui-logo">
+                                    <a href="index.html">
+                                        <img src="assets/media/logo-white.png" class="ui-logo-light" alt="CRAV Logo">
+                                        <img src="assets/media/logo.png" class="ui-logo-dark" alt="CRAV Logo">
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="ui-header-col">
+                                <!-- Begin overlay menu toggle button -->
+                                <div id="ui-ol-menu-toggle-btn-wrap">
+                                    <div class="ui-ol-menu-toggle-btn-text">
+                                        <span class="text-menu" data-hover="Open">Menu</span>
+                                        <span class="text-close">Close</span>
+                                    </div>
+                                    <div class="ui-ol-menu-toggle-btn-holder">
+                                        <a href="#" class="ui-ol-menu-toggle-btn"><span></span></a>
+                                    </div>
+                                </div>
+                                <!-- End overlay menu toggle button -->
+
+                                <!-- Begin overlay menu -->
+                                <nav class="ui-overlay-menu">
+                                    <div class="ui-ol-menu-holder">
+                                        <div class="ui-ol-menu-inner ui-wrap">
+                                            <div class="container-fluid">
+                                                <div class="ui-ol-menu-content">
+                                                    <div class="col-xxl-3 col-xl-3 col-lg-4 d-xl-block d-none">
+                                                        <div class="ui-menu-img-block">
+                                                            <img src="assets/media/images/menu-img.png" alt="CRAV">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xxl-6 col-xl-5 col-md-6 ui-menu-nav">
+                                                        <ul class="ui-ol-menu-list">
+                                                            <li class="ui-ol-submenu-wrap">
+                                                                <div class="ui-ol-submenu-trigger">
+                                                                    <a href="index.html">Home</a>
+                                                                    <div class="ui-ol-submenu-caret-wrap">
+                                                                        <div class="ui-ol-submenu-caret"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="ui-ol-submenu">
+                                                                    <ul class="ui-ol-submenu-list">
+                                                                        <li><a href="burger.html">Burger</a></li>
+                                                                        <li><a href="pizza.html">Pizza</a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </li>
+                                                            <li><a href="about.html">About Us</a></li>
+                                                            <li class="ui-ol-submenu-wrap">
+                                                                <div class="ui-ol-submenu-trigger">
+                                                                    <a href="#">Shop</a>
+                                                                    <div class="ui-ol-submenu-caret-wrap">
+                                                                        <div class="ui-ol-submenu-caret"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="ui-ol-submenu">
+                                                                    <ul class="ui-ol-submenu-list">
+                                                                        <li class="ui-ol-submenu-wrap">
+                                                                            <div class="ui-ol-submenu-trigger">
+                                                                                <a href="#" class="ui-ol-submenu-link">Product Lists</a>
+                                                                                <div class="ui-ol-submenu-caret-wrap">
+                                                                                    <div class="ui-ol-submenu-caret"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="ui-ol-submenu">
+                                                                                <ul class="ui-ol-submenu-list">
+                                                                                    <li><a href="shop-list.html">Shop List</a></li>
+                                                                                    <li><a href="shop-grid.html">Shop Grid</a></li>
+                                                                                    <li><a href="shop-grid-left-sidebar.html">Shop Grid (Sidebar Left)</a></li>
+                                                                                    <li><a href="shop-grid-right-sidebar.html">Shop Grid (Sidebar Right)</a></li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </li>
+                                                                        <li class="ui-ol-submenu-wrap">
+                                                                            <div class="ui-ol-submenu-trigger">
+                                                                                <a href="#" class="ui-ol-submenu-link">Product Ordering</a>
+                                                                                <div class="ui-ol-submenu-caret-wrap">
+                                                                                    <div class="ui-ol-submenu-caret"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="ui-ol-submenu">
+                                                                                <ul class="ui-ol-submenu-list">
+                                                                                    <li><a href="cart.html">Cart</a></li>
+                                                                                    <li><a href="checkout.html">Checkout</a></li>
+                                                                                    <li><a href="wishlist.html">Wishlist</a></li>
+                                                                                    <li><a href="order-tracking.html">Order Tracking</a></li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </li>
+                                                            <li class="ui-ol-submenu-wrap">
+                                                                <div class="ui-ol-submenu-trigger">
+                                                                    <a href="#">Pages</a>
+                                                                    <div class="ui-ol-submenu-caret-wrap">
+                                                                        <div class="ui-ol-submenu-caret"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="ui-ol-submenu">
+                                                                    <ul class="ui-ol-submenu-list">
+                                                                        <li><a href="menu.html">Menu</a></li>
+                                                                        <li><a href="team.html">Team</a></li>
+                                                                        <li><a href="login.html">Login</a></li>
+                                                                        <li><a href="signup.html">Signup</a></li>
+                                                                        <li><a href="dashboard.html">Dashboard</a></li>
+                                                                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                                                                        <li><a href="terms.html">Terms &amp; Conditions</a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </li>
+                                                            <li><a href="contact-us.html">Contact</a></li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-xxl-3 col-xl-3 col-md-6 d-md-block d-none">
+                                                        <div class="company-info">
+                                                            <img src="assets/media/vector/menu-vector.png" alt="" class="vector">
+                                                                    <div class="mb-32">
+                                                                        <h6 class="color-primary mb-8">Opening Hours</h6>
+                                                                        <p class="lead dark-gray">Every Day 11:00 AM to 11:00 PM</p>
+                                                                    </div>
+                                                                    <div class="mb-32">
+                                                                        <h6 class="mb-8">Contact CRAV</h6>
+                                                                        <p class="lead dark-gray mb-16"><a href="tel:+919000000000">+91 90000 00000</a></p>
+                                                                        <a class="lead dark-gray mb-16" href="mailto:hello@crav.example">hello@crav.example</a>
+                                                                    </div>
+                                                                    <ul class="social-icons-list unstyled">
+                                                                <li><a href="#"><img src="assets/media/icons/Facebook.svg" alt="Facebook"></a></li>
+                                                                <li><a href="#"><img src="assets/media/icons/Twitter.svg" alt="Twitter"></a></li>
+                                                                <li><a href="#"><img src="assets/media/icons/Instagram.svg" alt="Instagram"></a></li>
+                                                                <li><a href="#"><img src="assets/media/icons/Linkedin.svg" alt="LinkedIn"></a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </nav>
+                                <!-- End overlay menu -->
+
+                                <!-- Begin header tools -->
+                                <div class="ui-header-tools">
+                                    <a href="javascript:;" class="ui-header-tools-item search-toggler"><i class="fa-regular fa-magnifying-glass"></i></a>
+                                    <a href="wishlist.html" class="ui-header-tools-item wishlist-button" title="Wishlist"><i class="fa-regular fa-heart"></i><span class="cc-wishlist-badge" style="display:none">0</span></a>
+                                    <a href="dashboard.html" class="ui-header-tools-item" title="Dashboard"><i class="fa-solid fa-user-check" style="color: #F5B900;"></i></a>
+                                    <a href="javascript:;" class="ui-header-tools-item cart-button"><i class="fa-regular fa-cart-shopping"></i></a>
+                                </div>
+                                <!-- End header tools -->
+                            </div>
+                        </div>
+                    </header>
+                    <!-- Header end -->
+                    <h2 class="page-title">My Account</h2>
+                </section>
+
+            <div class="page-content py-80" style="background: #f9f9fb; min-height: 80vh;">
+                <div class="container">
+                    <div class="row">
+                        <!-- Sidebar Navigation -->
+                        <div class="col-lg-3 mb-40">
+                            <div class="dash-card text-center pb-24">
+                                <div style="width: 80px; height: 80px; border-radius: 50%; background: #FFF9E9; border: 2px solid #D90019; color: #D90019; font-size: 32px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                                    <i class="fa-solid fa-user"></i>
+                                </div>
+                                <h5 id="dash-user-name" class="mb-4">Loading...</h5>
+                                <p id="dash-user-email" class="lead text-muted" style="font-size: 13px;">user@example.com</p>
+                                <span class="badge bg-success text-white" id="dash-verified-badge"><i class="fa-solid fa-check"></i> Verified Account</span>
+                            </div>
+
+                            <div class="dash-card p-2">
+                                <button type="button" class="dash-nav-btn active" data-tab="tab-profile">
+                                    <i class="fa-solid fa-id-card"></i> Personal Profile
+                                </button>
+                                <button type="button" class="dash-nav-btn" data-tab="tab-addresses">
+                                    <i class="fa-solid fa-location-dot"></i> Saved Addresses
+                                </button>
+                                <button type="button" class="dash-nav-btn" data-tab="tab-orders">
+                                    <i class="fa-solid fa-bag-shopping"></i> My Orders
+                                </button>
+                                <button type="button" class="dash-nav-btn" data-tab="tab-reservations">
+                                    <i class="fa-solid fa-utensils"></i> Table Reservations
+                                </button>
+                                <button type="button" class="dash-nav-btn" data-tab="tab-security">
+                                    <i class="fa-solid fa-shield-halved"></i> Change Password
+                                </button>
+                                <button type="button" class="dash-nav-btn text-danger" id="dash-logout-btn">
+                                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Main Content Panes -->
+                        <div class="col-lg-9">
+                            <!-- TAB: Profile -->
+                            <div id="tab-profile" class="dash-tab-pane active">
+                                <div class="dash-card">
+                                    <h4 class="mb-24" style="color: #D90019;">Personal Profile</h4>
+                                    <form id="profile-form">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-20">
+                                                <label class="form-label font-weight-bold">First Name</label>
+                                                <input type="text" id="prof-fname" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-6 mb-20">
+                                                <label class="form-label font-weight-bold">Last Name</label>
+                                                <input type="text" id="prof-lname" class="form-control" required>
+                                            </div>
+                                            <div class="col-md-12 mb-20">
+                                                <label class="form-label font-weight-bold">Email Address</label>
+                                                <input type="email" id="prof-email" class="form-control" disabled>
+                                                <small class="text-muted">Email address cannot be changed.</small>
+                                            </div>
+                                        </div>
+                                        <div id="prof-status" class="alert alert-info py-2" style="display:none;"></div>
+                                        <button type="submit" class="cus-btn dark">Save Changes</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- TAB: Saved Addresses -->
+                            <div id="tab-addresses" class="dash-tab-pane">
+                                <div class="dash-card">
+                                    <div class="d-flex justify-content-between align-items-center mb-24">
+                                        <h4 style="color: #D90019; margin: 0;">Saved Delivery Addresses</h4>
+                                        <button type="button" class="cus-btn outline btn-sm" id="btn-show-add-addr">+ Add New Address</button>
+                                    </div>
+
+                                    <!-- Add Address Form (Hidden by default) -->
+                                    <div id="add-addr-card" class="p-4 mb-24 border rounded" style="display: none; background: #fffafa;">
+                                        <h5 class="mb-16">Add Delivery Address</h5>
+                                        <form id="new-address-form">
+                                            <div class="row">
+                                                <div class="col-12 mb-16">
+                                                    <label>Street Address</label>
+                                                    <input type="text" id="addr-line1" class="form-control" placeholder="House/Flat No., Building, Street" required>
+                                                </div>
+                                                <div class="col-12 mb-16">
+                                                    <label>Address Line 2 (Optional)</label>
+                                                    <input type="text" id="addr-line2" class="form-control" placeholder="Landmark, Area">
+                                                </div>
+                                                <div class="col-md-6 mb-16">
+                                                    <label>City / State</label>
+                                                    <input type="text" id="addr-state" class="form-control" required>
+                                                </div>
+                                                <div class="col-md-6 mb-16">
+                                                    <label>PIN Code</label>
+                                                    <input type="text" id="addr-zip" class="form-control" maxlength="6" required>
+                                                </div>
+                                                <div class="col-12 mb-16">
+                                                    <label><input type="checkbox" id="addr-default"> Set as default delivery address</label>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="cus-btn dark btn-sm">Save Address</button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm ms-2" id="btn-cancel-addr">Cancel</button>
+                                        </form>
+                                    </div>
+
+                                    <div id="addresses-list">Loading addresses...</div>
+                                </div>
+                            </div>
+
+                            <!-- TAB: Orders -->
+                            <div id="tab-orders" class="dash-tab-pane">
+                                <div class="dash-card">
+                                    <h4 class="mb-24" style="color: #D90019;">My Orders & Live Tracking</h4>
+                                    <div id="orders-list">Loading order history...</div>
+                                </div>
+                            </div>
+
+                            <!-- TAB: Reservations -->
+                            <div id="tab-reservations" class="dash-tab-pane">
+                                <div class="dash-card">
+                                    <div class="d-flex justify-content-between align-items-center mb-24">
+                                        <h4 style="color: #D90019; margin: 0;">My Table Reservations</h4>
+                                        <a href="contact-us.html#cravReservationForm" class="cus-btn primary btn-sm">+ Reserve A Table</a>
+                                    </div>
+                                    <div id="reservations-list">Loading reservations...</div>
+                                </div>
+                            </div>
+
+                            <!-- TAB: Security -->
+                            <div id="tab-security" class="dash-tab-pane">
+                                <div class="dash-card">
+                                    <h4 class="mb-24" style="color: #D90019;">Change Password</h4>
+                                    <form id="password-form" style="max-width: 440px;">
+                                        <div class="mb-20">
+                                            <label class="form-label font-weight-bold">Current Password</label>
+                                            <input type="password" id="pass-current" class="form-control" required>
+                                        </div>
+                                        <div class="mb-20">
+                                            <label class="form-label font-weight-bold">New Password</label>
+                                            <input type="password" id="pass-new" class="form-control" required>
+                                        </div>
+                                        <div id="pass-status" class="alert alert-info py-2" style="display:none;"></div>
+                                        <button type="submit" class="cus-btn dark">Update Password</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Area Start -->
+            <footer>
+                <div class="footer-main">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col-xl-3 text-xl-left text-center">
+                                <a href="index.html" class="mb-xl-0 mb-32">
+                                    <img src="assets/media/logo-white.png" alt="CRAV" style="height: 44px;" onerror="this.src='assets/models/logo.png'">
+                                </a>
+                            </div>
+                            <div class="col-xl-6">
+                                <ul class="footer-nav unstyled mb-xl-0 mb-32">
+                                    <li><a href="index.html">Home</a></li>
+                                    <li><a href="menu.html">Menu</a></li>
+                                    <li><a href="about.html">About</a></li>
+                                    <li><a href="contact-us.html">Contact</a></li>
+                                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                                    <li><a href="terms.html">Terms &amp; Conditions</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-xl-3">
+                                <ul class="social-icons-list unstyled">
+                                    <li><a href="#"><img src="assets/media/icons/Facebook.svg" alt="Facebook"></a></li>
+                                    <li><a href="#"><img src="assets/media/icons/Twitter.svg" alt="Twitter"></a></li>
+                                    <li><a href="#"><img src="assets/media/icons/Instagram.svg" alt="Instagram"></a></li>
+                                    <li><a href="#"><img src="assets/media/icons/Linkedin.svg" alt="LinkedIn"></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom text-center py-20" style="background:#080808; border-top: 1px solid #1a1a1a;">
+                    <div class="container">
+                        <p class="mb-0 text-muted" style="font-size: 13px;">&copy; 2026 CRAV. Academic Demo Project. All Rights Reserved. &bull; <a href="privacy-policy.html" class="text-muted">Privacy Policy</a> &bull; <a href="terms.html" class="text-muted">Terms &amp; Conditions</a></p>
+                    </div>
+                </div>
+            </footer>
+            <!-- Footer Area End -->
+        </main>
+    </div>
+</div>
+
+    <!-- Search Popup -->
+    <div class="search-popup">
+        <div class="search-popup__overlay search-toggler"></div>
+        <div class="search-popup__content text-center">
+            <form role="search" method="get" class="search-popup__form" action="shop-list.html">
+                <div class="blur-layer">
+                    <input type="text" id="search" autocomplete="off" placeholder="Search CRAV Menu...">
+                </div>
+                <button type="submit"><i class="fal fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mini Cart -->
+    <aside id="sidebar-cart">
+        <div class="d-flex align-items-center justify-content-between mb-32">
+            <h5>Your Cart</h5>
+            <a href="#" class="close-button"><i class="fa-regular fa-xmark close-icon"></i></a>
+        </div>
+        <div class="vr-line mb-32"></div>
+        <ul class="product-list"></ul>
+        <div class="price-total mb-24">
+            <h6>Subtotal</h6>
+            <h5 class="color-primary">₹0</h5>
+        </div>
+        <div class="vr-line mb-24"></div>
+        <div class="action-buttons">
+            <a href="cart.html" class="cus-btn outline">
+                <span class="icon-wrapper">
+                    <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                View Cart
+            </a>
+            <a href="checkout.html" class="cus-btn dark">
+                <span class="icon-wrapper">
+                    <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M16.2522 11.9789C14.4658 10.1925 13.7513 6.14339 15.6567 4.23792M15.6567 4.23792C14.565 5.3296 11.4885 7.21521 7.91576 3.64246M15.6567 4.23792L4.34301 15.5516" stroke="#FCFDFD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                Checkout
+            </a>
+        </div>
+    </aside>
+    <div id="sidebar-cart-curtain"></div>
+
+    <script src="assets/js/vendor/jquery-3.6.3.min.js"></script>
+    <script src="assets/js/vendor/bootstrap.min.js"></script>
+    <script src="assets/js/vendor/gsap.min.js"></script>
+    <script src="assets/js/vendor/scrollTrigger.min.js"></script>
+    <script src="assets/js/vendor/ScrollToPlugin.min.js"></script>
+    <script src="assets/js/vendor/ScrollSmoother.min.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/crav_auth.js"></script>
+    <script src="assets/js/crav_cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.CravAuth || !window.CravAuth.isLoggedIn()) {
+                window.location.href = 'login.html?redirect=dashboard.html';
+                return;
+            }
+
+            var token = window.CravAuth.getToken();
+            var user = window.CravAuth.getUser();
+
+            // Populate user badge
+            document.getElementById('dash-user-name').textContent = (user.firstName + ' ' + user.lastName).trim();
+            document.getElementById('dash-user-email').textContent = user.email;
+
+            // Prefill profile
+            document.getElementById('prof-fname').value = user.firstName || '';
+            document.getElementById('prof-lname').value = user.lastName || '';
+            document.getElementById('prof-email').value = user.email || '';
+
+            // Tab Navigation
+            var tabBtns = document.querySelectorAll('.dash-nav-btn[data-tab]');
+            var tabPanes = document.querySelectorAll('.dash-tab-pane');
+            tabBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var target = btn.getAttribute('data-tab');
+                    tabBtns.forEach(function (b) { b.classList.remove('active'); });
+                    tabPanes.forEach(function (p) { p.classList.remove('active'); });
+                    btn.classList.add('active');
+                    var pane = document.getElementById(target);
+                    if (pane) pane.classList.add('active');
+                    if (target === 'tab-addresses') loadAddresses();
+                    if (target === 'tab-orders') loadOrders();
+                    if (target === 'tab-reservations') loadReservations();
+                });
+            });
+
+            // Logout
+            document.getElementById('dash-logout-btn').addEventListener('click', function () {
+                window.CravAuth.logout();
+            });
+
+            // Update Profile Form
+            document.getElementById('profile-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                var status = document.getElementById('prof-status');
+                status.style.display = 'block';
+                status.className = 'alert alert-info py-2';
+                status.textContent = 'Saving changes...';
+
+                fetch('/api/user/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        firstName: document.getElementById('prof-fname').value,
+                        lastName: document.getElementById('prof-lname').value
+                    })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res.success) {
+                        status.className = 'alert alert-success py-2';
+                        status.textContent = 'Profile successfully updated!';
+                        user.firstName = res.user.firstName;
+                        user.lastName = res.user.lastName;
+                        user.phone = res.user.phone;
+                        window.CravAuth.setSession(token, null, user);
+                        document.getElementById('dash-user-name').textContent = (user.firstName + ' ' + user.lastName).trim();
+                    } else {
+                        status.className = 'alert alert-danger py-2';
+                        status.textContent = res.message || 'Error updating profile.';
+                    }
+                })
+                .catch(function () {
+                    status.className = 'alert alert-danger py-2';
+                    status.textContent = 'Server error.';
+                });
+            });
+
+            // Change Password Form
+            document.getElementById('password-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                var status = document.getElementById('pass-status');
+                status.style.display = 'block';
+                status.className = 'alert alert-info py-2';
+                status.textContent = 'Updating password...';
+
+                fetch('/api/user/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        currentPassword: document.getElementById('pass-current').value,
+                        newPassword: document.getElementById('pass-new').value
+                    })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res.success) {
+                        status.className = 'alert alert-success py-2';
+                        status.textContent = 'Password changed successfully!';
+                        document.getElementById('password-form').reset();
+                    } else {
+                        status.className = 'alert alert-danger py-2';
+                        status.textContent = res.message || 'Error changing password.';
+                    }
+                });
+            });
+
+            // Addresses
+            var addCard = document.getElementById('add-addr-card');
+            document.getElementById('btn-show-add-addr').addEventListener('click', function () {
+                addCard.style.display = addCard.style.display === 'none' ? 'block' : 'none';
+            });
+            document.getElementById('btn-cancel-addr').addEventListener('click', function () {
+                addCard.style.display = 'none';
+            });
+
+            document.getElementById('new-address-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                fetch('/api/user/addresses', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        address: document.getElementById('addr-line1').value,
+                        address2: document.getElementById('addr-line2').value,
+                        state: document.getElementById('addr-state').value,
+                        zipcode: document.getElementById('addr-zip').value,
+                        isDefault: document.getElementById('addr-default').checked
+                    })
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res.success) {
+                        addCard.style.display = 'none';
+                        document.getElementById('new-address-form').reset();
+                        loadAddresses();
+                    } else {
+                        alert(res.message || 'Error adding address');
+                    }
+                });
+            });
+
+            function loadAddresses() {
+                var listEl = document.getElementById('addresses-list');
+                fetch('/api/user/addresses', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (!res.addresses || !res.addresses.length) {
+                        listEl.innerHTML = '<p class="text-muted">No saved addresses yet. Click "+ Add New Address" above.</p>';
+                        return;
+                    }
+                    listEl.innerHTML = res.addresses.map(function (a) {
+                        return '<div class="address-box ' + (a.isDefault ? 'is-default' : '') + '">' +
+                            '<div class="d-flex justify-content-between align-items-center mb-8">' +
+                            '<h6>' + (a.isDefault ? '<span class="badge-default me-2">DEFAULT</span>' : '') + (a.firstName || '') + ' ' + (a.lastName || '') + '</h6>' +
+                            '<div>' +
+                            (!a.isDefault ? '<button class="btn btn-sm btn-outline-primary py-0 px-2 me-2 set-def-btn" data-id="' + a.id + '">Set Default</button>' : '') +
+                            '<button class="btn btn-sm btn-outline-danger py-0 px-2 del-addr-btn" data-id="' + a.id + '"><i class="fa-solid fa-trash"></i></button>' +
+                            '</div></div>' +
+                            '<p class="mb-1 text-secondary">' + a.address + (a.address2 ? ', ' + a.address2 : '') + '</p>' +
+                            '<p class="mb-0 text-muted">' + a.state + ' &bull; PIN ' + a.zipcode + '</p>' +
+                            '</div>';
+                    }).join('');
+
+                    // Bind delete and set default
+                    listEl.querySelectorAll('.del-addr-btn').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            if (!confirm('Remove this saved address?')) return;
+                            fetch('/api/user/addresses/' + btn.getAttribute('data-id'), {
+                                method: 'DELETE',
+                                headers: { 'Authorization': 'Bearer ' + token }
+                            }).then(function () { loadAddresses(); });
+                        });
+                    });
+
+                    listEl.querySelectorAll('.set-def-btn').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            fetch('/api/user/addresses/' + btn.getAttribute('data-id') + '/default', {
+                                method: 'PUT',
+                                headers: { 'Authorization': 'Bearer ' + token }
+                            }).then(function () { loadAddresses(); });
+                        });
+                    });
+                });
+            }
+
+            function loadOrders() {
+                var listEl = document.getElementById('orders-list');
+                fetch('/api/orders/my-orders', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (!res.orders || !res.orders.length) {
+                        listEl.innerHTML = '<p class="text-muted">You haven\'t placed any orders yet. <a href="menu.html" class="color-primary">Explore our menu!</a></p>';
+                        return;
+                    }
+                    listEl.innerHTML = res.orders.map(function (o) {
+                        return '<div class="order-history-item">' +
+                            '<div class="d-flex justify-content-between align-items-center mb-12">' +
+                            '<div><h6 class="mb-1">Order #' + o.id + '</h6><small class="text-muted">' + new Date(o.createdAt).toLocaleString() + '</small></div>' +
+                            '<span class="badge bg-danger text-white px-3 py-2">' + (o.tracking ? o.tracking.currentStage : 'Confirmed') + '</span>' +
+                            '</div>' +
+                            '<p class="mb-2 text-secondary">' + (o.items ? o.items.map(function(i){ return i.name + ' (' + i.qty + ')'; }).join(', ') : '') + '</p>' +
+                            '<div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">' +
+                            '<h5 class="color-primary mb-0">Total: ₹' + o.total + '</h5>' +
+                            '<a href="order-tracking.html?order=' + encodeURIComponent(o.id) + '" class="cus-btn dark btn-sm py-1 px-3">Live Tracking &rarr;</a>' +
+                            '</div></div>';
+                    }).join('');
+                });
+            }
+
+            function loadReservations() {
+                var listEl = document.getElementById('reservations-list');
+                fetch('/api/reservations/my-reservations', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (!res.reservations || !res.reservations.length) {
+                        listEl.innerHTML = '<p class="text-muted">No table reservations found. <a href="contact-us.html#cravReservationForm" class="color-primary">Reserve a table now!</a></p>';
+                        return;
+                    }
+                    listEl.innerHTML = res.reservations.map(function (resv) {
+                        return '<div class="order-history-item">' +
+                            '<div class="d-flex justify-content-between align-items-center mb-12">' +
+                            '<div><h6 class="mb-1">Table ' + resv.tableNumber + ' &bull; ' + resv.bookingId + '</h6><small class="text-muted">' + resv.date + ' at ' + resv.time + '</small></div>' +
+                            '<span class="badge bg-success text-white px-3 py-2">' + resv.status + '</span>' +
+                            '</div>' +
+                            '<p class="mb-2 text-secondary">Guests: ' + resv.guests + ' Persons &bull; Guest Name: ' + resv.guestName + '</p>' +
+                            '<div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">' +
+                            '<button type="button" class="btn btn-outline-danger btn-sm view-res-ticket-btn" data-res=\'' + JSON.stringify(resv) + '\'>View Digital Ticket</button>' +
+                            '<a href="/api/reservations/verify/' + encodeURIComponent(resv.bookingId) + '" target="_blank" class="btn btn-sm btn-link text-muted">Verify Online</a>' +
+                            '</div></div>';
+                    }).join('');
+
+                    listEl.querySelectorAll('.view-res-ticket-btn').forEach(function (btn) {
+                        btn.addEventListener('click', function () {
+                            var r = JSON.parse(btn.getAttribute('data-res'));
+                            showDigitalTicketModal(r);
+                        });
+                    });
+                });
+            }
+
+            window.showDigitalTicketModal = function(r) {
+                var o = document.getElementById('cc-overlay');
+                if (!o) { o = document.createElement('div'); o.id = 'cc-overlay'; document.body.appendChild(o); }
+                o.className = 'show';
+                o.innerHTML = '<div class="ticket-modal-card">' +
+                    '<h3 style="color:#D90019; margin-bottom:4px; letter-spacing:2px;">CRAV</h3>' +
+                    '<p style="color:#F5B900; font-size:13px; font-weight:600; margin-bottom:16px;">DIGITAL RESERVATION TICKET</p>' +
+                    '<div style="background:#22c55e18; color:#22c55e; border:1px solid #22c55e; border-radius:20px; font-size:12px; font-weight:bold; padding:4px 12px; display:inline-block; margin-bottom:16px;">CONFIRMED RESERVATION</div>' +
+                    '<div style="background:#D90019; color:#fff; font-size:24px; font-weight:bold; padding:10px; border-radius:10px; margin-bottom:18px;">Table ' + r.tableNumber + '</div>' +
+                    '<div style="text-align:left; font-size:14px; margin-bottom:16px; border-bottom:1px dashed #eee; padding-bottom:12px;">' +
+                    '<div class="d-flex justify-content-between mb-2"><span>Booking ID:</span><b>' + r.bookingId + '</b></div>' +
+                    '<div class="d-flex justify-content-between mb-2"><span>Guest Name:</span><b>' + r.guestName + '</b></div>' +
+                    '<div class="d-flex justify-content-between mb-2"><span>Guests:</span><b>' + r.guests + ' Persons</b></div>' +
+                    '<div class="d-flex justify-content-between mb-2"><span>Date & Time:</span><b>' + r.date + ' @ ' + r.time + '</b></div>' +
+                    (r.phone ? '<div class="d-flex justify-content-between"><span>Phone:</span><b>' + r.phone + '</b></div>' : '') +
+                    '</div>' +
+                    (r.qrCodeDataUrl ? '<img src="' + r.qrCodeDataUrl + '" style="width:160px; height:160px; margin-bottom:16px; border:1px solid #eee; border-radius:8px;">' : '') +
+                    '<div class="d-flex gap-2 justify-content-center">' +
+                    '<button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print();"><i class="fa-solid fa-print"></i> Print Ticket</button>' +
+                    '<button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById(\'cc-overlay\').className=\'\';">Close</button>' +
+                    '</div></div>';
+            };
+        });
+    </script>
+</body>
+</html>

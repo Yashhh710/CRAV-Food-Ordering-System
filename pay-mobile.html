@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CRAV – Demo Mobile Payment</title>
+  <link rel="shortcut icon" href="assets/models/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="assets/css/vendor/all.min.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <style>
+    :root {
+      --crav-red: #D90019;
+      --crav-burgundy: #8F1420;
+      --crav-cream: #FFF9E9;
+      --crav-gold: #F5B900;
+      --crav-black: #080808;
+      --crav-white: #FFFFFF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    body {
+      background: #0f0f11;
+      color: var(--crav-white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .pay-card {
+      background: #18181c;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 440px;
+      padding: 28px 24px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      position: relative;
+      overflow: hidden;
+    }
+    .pay-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--crav-red), var(--crav-gold));
+    }
+    .demo-pill {
+      display: inline-block;
+      background: rgba(245, 185, 0, 0.15);
+      color: var(--crav-gold);
+      border: 1px solid rgba(245, 185, 0, 0.4);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .brand-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .brand-logo {
+      height: 48px;
+      margin-bottom: 8px;
+    }
+    .order-meta-box {
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 24px;
+      border: 1px dashed rgba(255,255,255,0.12);
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    .meta-row:last-child { margin-bottom: 0; }
+    .meta-label { color: #a0a0a5; }
+    .meta-value { font-weight: 600; color: #fff; }
+    .amount-large {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--crav-red);
+      text-align: center;
+      margin: 16px 0;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status-pending {
+      background: rgba(245, 185, 0, 0.15);
+      color: var(--crav-gold);
+    }
+    .status-success {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+    .btn-pay-now {
+      width: 100%;
+      background: var(--crav-red);
+      color: #fff;
+      border: none;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(217, 0, 25, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-pay-now:active {
+      transform: scale(0.98);
+      background: var(--crav-burgundy);
+    }
+    .btn-pay-now:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-track {
+      width: 100%;
+      background: #22c55e;
+      color: #fff;
+      text-decoration: none;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
+    }
+    .disclaimer {
+      font-size: 11px;
+      color: #71717a;
+      text-align: center;
+      margin-top: 20px;
+      line-height: 1.4;
+    }
+    /* Processing & Success states */
+    .view-state { display: none; }
+    .view-state.active { display: block; }
+    .spinner-ring {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(217, 0, 25, 0.2);
+      border-top-color: var(--crav-red);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .success-check-circle {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.15);
+      border: 2px solid #22c55e;
+      color: #22c55e;
+      font-size: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 16px auto;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="pay-card">
+    <div style="text-align: center;">
+      <span class="demo-pill"><i class="fa-solid fa-graduation-cap"></i> Academic Demo Simulation</span>
+    </div>
+
+    <div class="brand-header">
+      <img src="assets/models/logo.png" alt="CRAV" class="brand-logo" onerror="this.src='assets/media/logo.png'">
+      <p style="color: var(--crav-gold); font-size: 13px; font-weight: 500;">From Craving to Doorstep</p>
+    </div>
+
+    <!-- INITIAL STATE -->
+    <div id="state-initial" class="view-state active">
+      <div style="text-align: center; margin-bottom: 12px;">
+        <span class="status-badge status-pending" id="badge-status">
+          <i class="fa-solid fa-clock"></i> Payment Pending
+        </span>
+      </div>
+
+      <div class="amount-large" id="display-amount">₹0.00</div>
+
+      <div class="order-meta-box">
+        <div class="meta-row">
+          <span class="meta-label">Order Reference</span>
+          <span class="meta-value" id="display-order-id">Loading...</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Customer</span>
+          <span class="meta-value" id="display-customer">Valued Customer</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Payment Mode</span>
+          <span class="meta-value" style="color: var(--crav-gold);">Simulated UPI QR</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn-pay-now" id="btn-pay-action">
+        <i class="fa-solid fa-lock"></i> Pay Now (Demo)
+      </button>
+    </div>
+
+    <!-- PROCESSING STATE -->
+    <div id="state-processing" class="view-state" style="text-align: center; padding: 20px 0;">
+      <div class="spinner-ring"></div>
+      <h3 style="color: #fff; margin-bottom: 8px;">Processing Demo Payment...</h3>
+      <p style="color: #a0a0a5; font-size: 13px;">Simulating secure mobile transaction...</p>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div id="state-success" class="view-state" style="text-align: center;">
+      <div class="success-check-circle">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 style="color: #22c55e; margin-bottom: 6px;">Demo Payment Successful!</h3>
+      <p style="color: #a0a0a5; font-size: 13px; margin-bottom: 20px;">Your transaction has been verified on the server.</p>
+
+      <div class="order-meta-box" style="text-align: left;">
+        <div class="meta-row">
+          <span class="meta-label">Amount Paid</span>
+          <span class="meta-value" style="color: #22c55e;" id="success-amount">₹0.00</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Transaction ID</span>
+          <span class="meta-value" style="font-family: monospace; font-size: 12px;" id="success-txn">TXN-DEMO</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Order ID</span>
+          <span class="meta-value" id="success-order">CRV-DEMO</span>
+        </div>
+      </div>
+
+      <a href="#" class="btn-track" id="btn-goto-tracking">
+        <i class="fa-solid fa-route"></i> Continue to Order Tracking
+      </a>
+    </div>
+
+    <div class="disclaimer">
+      ⚠️ <strong>Academic Project Simulation:</strong> No actual banking channels, cards, or UPI PINs are utilized. No real funds are transferred.
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var orderId = params.get('orderId') || 'CRV-DEMO-SAMPLE';
+      var fallbackAmount = params.get('amount') || '0';
+
+      var displayOrderId = document.getElementById('display-order-id');
+      var displayAmount = document.getElementById('display-amount');
+      var displayCustomer = document.getElementById('display-customer');
+      var btnPay = document.getElementById('btn-pay-action');
+      var btnTrack = document.getElementById('btn-goto-tracking');
+
+      displayOrderId.textContent = orderId;
+      displayAmount.textContent = '₹' + parseFloat(fallbackAmount).toFixed(2);
+      btnTrack.href = 'order-tracking.html?order=' + encodeURIComponent(orderId);
+
+      // Fetch official order details from backend
+      fetch('/api/payments/order-details/' + encodeURIComponent(orderId))
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.success && data.order) {
+            displayAmount.textContent = '₹' + parseFloat(data.order.total).toFixed(2);
+            displayCustomer.textContent = data.order.customerName || 'Valued Customer';
+            if (data.order.status === 'Successful') {
+              showSuccessState(data.order.transactionId || 'TXN-DEMO-ALREADY-PAID', data.order.total);
+            }
+          }
+        })
+        .catch(function () {
+          // Fallback works with query params
+        });
+
+      btnPay.addEventListener('click', function () {
+        showState('processing');
+        btnPay.disabled = true;
+
+        // Simulate short realistic network delay then hit server
+        setTimeout(function () {
+          fetch('/api/payments/complete-demo-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: orderId })
+          })
+          .then(function (res) { return res.json(); })
+          .then(function (result) {
+            if (result.success) {
+              showSuccessState(result.transactionId, result.amount);
+            } else {
+              alert(result.message || 'Payment simulation failed.');
+              showState('initial');
+              btnPay.disabled = false;
+            }
+          })
+          .catch(function (err) {
+            console.error('Error completing payment:', err);
+            // Standalone fallback
+            var fallbackTxn = 'TXN-DEMO-' + Date.now().toString(36).toUpperCase();
+            showSuccessState(fallbackTxn, fallbackAmount);
+          });
+        }, 1200);
+      });
+
+      function showState(st) {
+        document.getElementById('state-initial').classList.toggle('active', st === 'initial');
+        document.getElementById('state-processing').classList.toggle('active', st === 'processing');
+        document.getElementById('state-success').classList.toggle('active', st === 'success');
+      }
+
+      function showSuccessState(txnId, amt) {
+        showState('success');
+        document.getElementById('success-amount').textContent = '₹' + parseFloat(amt || fallbackAmount).toFixed(2);
+        document.getElementById('success-txn').textContent = txnId;
+        document.getElementById('success-order').textContent = orderId;
+      }
+    })();
+  </script>
+</body>
+</html>

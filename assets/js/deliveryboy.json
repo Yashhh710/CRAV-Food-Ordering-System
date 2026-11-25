@@ -1,0 +1,128 @@
+{
+  "deliveryBoys": [
+    {
+      "id": "db-001",
+      "name": "Rahul Patil",
+      "phone": "+91 98200 11234",
+      "image": "assets/media/delivery/db-001.png",
+      "vehicle": "Honda Activa",
+      "vehicle_number": "MH 46 AB 1204",
+      "rating": 4.8,
+      "deliveries": 1240,
+      "experience": "3 yrs",
+      "languages": [
+        "Marathi",
+        "Hindi",
+        "English"
+      ]
+    },
+    {
+      "id": "db-002",
+      "name": "Amit Sharma",
+      "phone": "+91 98190 22345",
+      "image": "assets/media/delivery/db-002.png",
+      "vehicle": "TVS Jupiter",
+      "vehicle_number": "MH 46 CD 3381",
+      "rating": 4.7,
+      "deliveries": 980,
+      "experience": "2 yrs",
+      "languages": [
+        "Hindi",
+        "English"
+      ]
+    },
+    {
+      "id": "db-003",
+      "name": "Sagar More",
+      "phone": "+91 97020 33456",
+      "image": "assets/media/delivery/db-003.png",
+      "vehicle": "Hero Splendor",
+      "vehicle_number": "MH 06 EF 7745",
+      "rating": 4.9,
+      "deliveries": 1560,
+      "experience": "4 yrs",
+      "languages": [
+        "Marathi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "db-004",
+      "name": "Imran Shaikh",
+      "phone": "+91 98330 44567",
+      "image": "assets/media/delivery/db-004.png",
+      "vehicle": "Bajaj Pulsar",
+      "vehicle_number": "MH 43 GH 5520",
+      "rating": 4.6,
+      "deliveries": 860,
+      "experience": "2 yrs",
+      "languages": [
+        "Hindi",
+        "Urdu",
+        "English"
+      ]
+    },
+    {
+      "id": "db-005",
+      "name": "Vikas Jadhav",
+      "phone": "+91 99870 55678",
+      "image": "assets/media/delivery/db-005.png",
+      "vehicle": "Suzuki Access",
+      "vehicle_number": "MH 46 JK 9012",
+      "rating": 4.8,
+      "deliveries": 1105,
+      "experience": "3 yrs",
+      "languages": [
+        "Marathi",
+        "Hindi",
+        "English"
+      ]
+    },
+    {
+      "id": "db-006",
+      "name": "Nitin Gaikwad",
+      "phone": "+91 98920 66789",
+      "image": "assets/media/delivery/db-006.png",
+      "vehicle": "Honda Shine",
+      "vehicle_number": "MH 04 LM 2268",
+      "rating": 4.5,
+      "deliveries": 720,
+      "experience": "1 yr",
+      "languages": [
+        "Marathi",
+        "Hindi"
+      ]
+    },
+    {
+      "id": "db-007",
+      "name": "Deepak Yadav",
+      "phone": "+91 98210 77890",
+      "image": "assets/media/delivery/db-007.png",
+      "vehicle": "TVS Apache",
+      "vehicle_number": "MH 46 NP 6634",
+      "rating": 4.7,
+      "deliveries": 1010,
+      "experience": "2 yrs",
+      "languages": [
+        "Hindi",
+        "English"
+      ]
+    },
+    {
+      "id": "db-008",
+      "name": "Prashant Kale",
+      "phone": "+91 97730 88901",
+      "image": "assets/media/delivery/db-008.png",
+      "vehicle": "Yamaha Fascino",
+      "vehicle_number": "MH 46 QR 4479",
+      "rating": 4.9,
+      "deliveries": 1710,
+      "experience": "5 yrs",
+      "languages": [
+        "Marathi",
+        "Hindi",
+        "English"
+      ]
+    }
+  ]
+}
