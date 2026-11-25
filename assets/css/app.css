@@ -22,10 +22,7 @@ STYLE SHEET INDEXING
 /*-------------------------
     Fonts
 -------------------------*/
-@import url("../../../../../../css2-2");
-@import url("../../../../../../css2-3");
-@import url("../../../../../../css2-4");
-@import url("../../../../../../css2-5");
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 /*-------------------------
     Variables
 -------------------------*/
