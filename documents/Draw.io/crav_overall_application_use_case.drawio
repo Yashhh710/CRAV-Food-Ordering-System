@@ -1,0 +1,54 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="crav_overall_application_use_case" name="Overall Application">
+    <mxGraphModel dx="1200" dy="1300" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="994" pageHeight="667" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="CRAV System – Overall Application Use Case Diagram" style="text;html=1;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="124" y="-17" width="720" height="56" as="geometry"/></mxCell>
+        <mxCell id="system" value="CRAV System" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;verticalAlign=top;fontStyle=1;fontSize=17;strokeWidth=1.5;" vertex="1" parent="1"><mxGeometry x="124" y="46" width="720" height="541" as="geometry"/></mxCell>
+        <mxCell id="u_browse" value="Browse Menu" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="168" y="70" width="150" height="41" as="geometry"/></mxCell>
+        <mxCell id="u_cart" value="Add to Cart" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="168" y="118" width="150" height="40" as="geometry"/></mxCell>
+        <mxCell id="u_place" value="Place Order" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="168" y="164" width="154" height="39" as="geometry"/></mxCell>
+        <mxCell id="u_track" value="Track Order" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="166" y="208" width="152" height="40" as="geometry"/></mxCell>
+        <mxCell id="u_offers" value="View Offers &amp; Rewards" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="166" y="255" width="162" height="41" as="geometry"/></mxCell>
+        <mxCell id="u_acct" value="Manage Account" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="167" y="302" width="158" height="42" as="geometry"/></mxCell>
+        <mxCell id="u_pay" value="Make Payment&lt;br&gt;(QR / UPI)" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="404" y="153" width="144" height="54" as="geometry"/></mxCell>
+        <mxCell id="u_prof" value="Update Profile" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="404" y="300" width="144" height="45" as="geometry"/></mxCell>
+        <mxCell id="u_assigned" value="View Assigned Deliveries" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="166" y="384" width="184" height="48" as="geometry"/></mxCell>
+        <mxCell id="u_upd" value="Update Delivery Status" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="166" y="439" width="185" height="48" as="geometry"/></mxCell>
+        <mxCell id="u_hist" value="View Delivery History" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="167" y="493" width="182" height="46" as="geometry"/></mxCell>
+        <mxCell id="u_menu" value="Manage Menu Items" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="595" y="82" width="170" height="44" as="geometry"/></mxCell>
+        <mxCell id="u_users" value="Manage Users" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="595" y="136" width="170" height="44" as="geometry"/></mxCell>
+        <mxCell id="u_coffers" value="Create / Manage Offers" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="594" y="189" width="174" height="45" as="geometry"/></mxCell>
+        <mxCell id="u_reports" value="View Reports" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="595" y="246" width="171" height="45" as="geometry"/></mxCell>
+        <mxCell id="u_rprof" value="Manage Restaurant Profile" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="583" y="352" width="194" height="44" as="geometry"/></mxCell>
+        <mxCell id="u_compl" value="Manage Complaints" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="583" y="405" width="194" height="46" as="geometry"/></mxCell>
+        <mxCell id="u_fb" value="View Feedback" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="583" y="459" width="194" height="46" as="geometry"/></mxCell>
+        <mxCell id="u_coupons" value="Manage Offers &amp; Coupons" style="ellipse;whiteSpace=wrap;html=1;fontSize=11;" vertex="1" parent="1"><mxGeometry x="578" y="514" width="199" height="48" as="geometry"/></mxCell>
+        <mxCell id="a_cust" value="Customer" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="38" y="141" width="26" height="56" as="geometry"/></mxCell>
+        <mxCell id="a_del" value="Delivery&lt;br&gt;Partner" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="38" y="401" width="26" height="56" as="geometry"/></mxCell>
+        <mxCell id="a_staff" value="Staff&lt;br&gt;(Restaurant + Support)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="903" y="135" width="26" height="60" as="geometry"/></mxCell>
+        <mxCell id="a_admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=11;fontStyle=1;" vertex="1" parent="1"><mxGeometry x="908" y="411" width="26" height="59" as="geometry"/></mxCell>
+        <mxCell id="a1" style="endArrow=none;html=1;" edge="1" parent="1" source="a_cust" target="u_browse"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a2" style="endArrow=none;html=1;" edge="1" parent="1" source="a_cust" target="u_cart"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a3" style="endArrow=none;html=1;" edge="1" parent="1" source="a_cust" target="u_place"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a4" style="endArrow=none;html=1;" edge="1" parent="1" source="a_cust" target="u_track"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a5" style="endArrow=none;html=1;" edge="1" parent="1" source="a_cust" target="u_offers"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a6" style="endArrow=none;html=1;" edge="1" parent="1" source="a_cust" target="u_acct"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a7" style="endArrow=none;html=1;" edge="1" parent="1" source="a_del" target="u_assigned"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a8" style="endArrow=none;html=1;" edge="1" parent="1" source="a_del" target="u_upd"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a9" style="endArrow=none;html=1;" edge="1" parent="1" source="a_del" target="u_hist"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a10" style="endArrow=none;html=1;" edge="1" parent="1" source="a_staff" target="u_menu"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a11" style="endArrow=none;html=1;" edge="1" parent="1" source="a_staff" target="u_users"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a12" style="endArrow=none;html=1;" edge="1" parent="1" source="a_staff" target="u_coffers"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a13" style="endArrow=none;html=1;" edge="1" parent="1" source="a_staff" target="u_reports"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a14" style="endArrow=none;html=1;" edge="1" parent="1" source="a_admin" target="u_rprof"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a15" style="endArrow=none;html=1;" edge="1" parent="1" source="a_admin" target="u_compl"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a16" style="endArrow=none;html=1;" edge="1" parent="1" source="a_admin" target="u_fb"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a17" style="endArrow=none;html=1;" edge="1" parent="1" source="a_admin" target="u_coupons"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="r1" value="«include»" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;labelBackgroundColor=none;verticalAlign=bottom;" edge="1" parent="1" source="u_place" target="u_pay"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="r2" value="«include»" style="endArrow=open;endFill=0;dashed=1;html=1;fontSize=10;labelBackgroundColor=none;verticalAlign=bottom;" edge="1" parent="1" source="u_acct" target="u_prof"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
