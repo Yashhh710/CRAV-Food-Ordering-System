@@ -263,6 +263,7 @@ Explore the deployed CRAV Food Ordering & Delivery Management System through the
 | 🔐 Admin Login | Administrator authentication page | [Admin Login](https://crav-food-ordering.web.app/admin-login.html) |
 | 📊 Admin Dashboard | Administrative control panel | [Admin Dashboard](https://crav-food-ordering.web.app/admin.html) |
 | 🖥️ Render Deployment | Alternative full-stack deployment | [Open Render Website](https://crav-food-ordering-system.onrender.com/) |
+| 📄 Documents | All files | [Documents](https://yashhh710.github.io/CRAV-Food-Ordering-System/documents/index.html) |
 
 ### 🛒 Customer Pages
 
@@ -296,7 +297,7 @@ Explore the deployed CRAV Food Ordering & Delivery Management System through the
 | GitHub Repository | Project source code | [View Repository](https://github.com/Yashhh710/CRAV-Food-Ordering-System) |
 | Firebase Hosting | Frontend deployment | [Firebase Website](https://crav-food-ordering.web.app/) |
 | Render | Backend deployment | [Render Website](https://crav-h5cj.onrender.com/) |
-
+| Documents | All files | [Documents](https://yashhh710.github.io/CRAV-Food-Ordering-System/documents/index.html) |
 ---
 
 
